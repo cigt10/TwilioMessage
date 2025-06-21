@@ -1,10 +1,10 @@
 const twilio = require('twilio');
 
-const accountSid = 'xxxxxx';
-const authToken = 'xxxxxxxx';
+const accountSid = process.env.TWILIO_ACCOUNT_SID || 'your_account_sid_here';
+const authToken = process.env.TWILIO_AUTH_TOKEN || 'your_auth_token_here';
 const client = new twilio(accountSid, authToken);
 
-const fromNumber = 'xxxx'; // Twilio sandbox number
+const fromNumber = process.env.TWILIO_FROM_NUMBER || 'your_twilio_number_here'; // Twilio sandbox number
 
 async function sendWhatsAppMessage(to, message, mediaUrl) {
   console.log(`Sending to ${to} with body="${message}" and mediaUrl="${mediaUrl}"`);

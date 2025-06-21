@@ -4,7 +4,7 @@ const accountSid = 'xxxxxx';
 const authToken = 'xxxxxxxx';
 const client = new twilio(accountSid, authToken);
 
-const fromNumber = 'whatsapp:+14155238886'; // Twilio sandbox number
+const fromNumber = 'xxxx'; // Twilio sandbox number
 
 async function sendWhatsAppMessage(to, message, mediaUrl) {
   console.log(`Sending to ${to} with body="${message}" and mediaUrl="${mediaUrl}"`);

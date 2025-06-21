@@ -1,0 +1,181 @@
+<!-- <body>
+  <div class="container">
+    <h2 class="title"> CIGT Bulk Message Sender</h2>
+
+    <div class="form-group">
+      <label for="numbersInput"> Phone Numbers (comma separated)</label>
+      <textarea id="numbersInput" [(ngModel)]="numbersInput" rows="4" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="excelUpload"> Import from Excel</label>
+      <input id="excelUpload" type="file" (change)="onFileChange($event)" accept=".xlsx, .xls"
+        class="form-control-file" />
+    </div>
+
+    <div class="form-group">
+      <label for="message"> Message</label>
+      <textarea id="message" [(ngModel)]="message" rows="3" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="mediaUrl"> Media URL (optional)</label>
+      <textarea id="mediaUrl" [(ngModel)]="mediaUrl" rows="2" placeholder="https://example.com/image.jpg"
+        class="form-control"></textarea>
+    </div>
+
+    <button class="btn-send" (click)="sendMessages()"> Send Messages</button>
+
+    <div class="result" *ngIf="result?.message">
+      <h3> Delivery Status</h3>
+      <p><strong>Status:</strong> {{ result?.message }}</p>
+      <p><strong>Delivered:</strong> {{ result?.deliverMsgCount }}</p>
+      <p><strong>Undelivered:</strong> {{ result?.unDeliverMsgCount }}</p>
+    </div>
+  </div>
+</body> -->
+
+
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  
+  <div class="container mt-5" style="max-width: 600px;">
+    <div class="p-4 shadow rounded bg-white">
+      <h2 class="text-center text-primary mb-4">CIGT Bulk Message Sender 🚀</h2>
+  
+      
+      <div class="mb-3">
+        <label class="form-label fw-bold">📞 Phone Numbers (comma separated)</label>
+        <textarea [(ngModel)]="numbersInput" rows="4" class="form-control"
+          placeholder="Ex: 9876543210,9123456789"></textarea>
+      </div>
+  
+      
+      <div class="mb-3">
+        <label class="form-label fw-bold">📥 Import from Excel</label>
+        <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
+      </div>
+  
+      
+      <div class="mb-3">
+        <label class="form-label fw-bold">💬 Message</label>
+        <textarea [(ngModel)]="message" rows="3" class="form-control" placeholder="Type your message here..."></textarea>
+      </div>
+  
+      
+      <div class="mb-3">
+        <label class="form-label fw-bold">📎 Upload Media (Image, PDF, Video)</label>
+        <input type="file" (change)="onMediaFileSelected($event)" accept="image/*,application/pdf,video/*"
+          class="form-control" />
+      </div>
+  
+      
+      <div class="d-grid">
+        <button class="btn btn-success fw-bold" (click)="sendMessages()">🚀 Send Messages</button>
+      </div>
+  
+    
+      <div *ngIf="result.length > 0" class="alert alert-info mt-4">
+        <h5>📊 Result</h5>
+        <ul class="list-group">
+          <li *ngFor="let r of result" class="list-group-item">
+            {{ r.number }} → {{ r.status }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div> -->
+  <!-- <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/> -->
+  <!-- GLOBAL CONTAINER -->
+  <div class="container">
+    <div class="header">
+      <img src="" alt="Icon" />
+      <h2>CIGTWA</h2>
+      <div class="badge">FREE</div>
+    </div>
+    <div class="sheetwa-wrapper">
+      
+      <app-menu-sidebar (panelSelected)="activePanel = $event"></app-menu-sidebar>
+
+      <div [ngSwitch]="activePanel">
+        <div *ngSwitchCase="'paste'"><app-manual-entry></app-manual-entry></div>
+        <div *ngSwitchCase="'excel'"><app-excel-upload></app-excel-upload></div>
+        <div *ngSwitchCase="'google'"><app-google-sheet></app-google-sheet></div>
+      </div>
+    </div>
+  </div>
+      <!-- Sidebar -->
+      <!-- <div class="sidebar">
+              <button class="input-source-btn"(click)="activePanel = 'paste'">Copy</button>
+              <button class="input-source-btn" (click)="activePanel = 'excel'">Excel Sheets</button>
+              <button class="input-source-btn">Google Sheets</button>
+              <button class="input-source-btn">CSV, Other Formats</button>
+              <button class="input-source-btn">Saved Contacts</button>
+            </div> -->
+      <!-- <div class="main-panel">
+        <div class="form-group-inline">
+          <select class="form-control country-code">
+            <option>+91</option>
+            <option>+82</option>
+          </select>
+          <input class="form-control number-input" placeholder="Add numbers here..." />
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input type="checkbox" [(ngModel)]="showAttachments" />
+            Add Attachments
+          </label>
+          
+          <div *ngIf="showAttachments" class="attachment-options">
+           
+            <div class="option" (click)="triggerFileSelect('image')">
+              <div class="circle blue">🖼️</div>
+              <div class="label">Image</div>
+              <input type="file" accept="image/*" #imageInput hidden (change)="handleFile($event, 'Image')" />
+            </div>
+          
+            
+            <div class="option" (click)="triggerFileSelect('video')">
+              <div class="circle blue">🎥</div>
+              <div class="label">Video</div>
+              <input type="file" accept="video/*" #videoInput hidden (change)="handleFile($event, 'Video')" />
+            </div>
+          
+            
+            <div class="option" (click)="triggerFileSelect('document')">
+              <div class="circle blue">📄</div>
+              <div class="label">Document</div>
+              <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" #docInput hidden
+                (change)="handleFile($event, 'Document')" />
+            </div>
+          
+            
+            <div class="option disabled">
+              <div class="circle gray">📊</div>
+              <div class="label gray">Poll</div>
+            </div>
+          </div>
+          
+          <label class="checkbox-group">
+            <input type="checkbox" checked />
+            Send random time-gap of up to
+            <input type="number" value="30" min="0" class="time-gap-input" /> seconds.
+          </label>
+        </div>
+  
+        <div class="form-group">
+          <textarea placeholder="Write here ..." class="form-control message-box"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-primary send-btn">Back</button>
+      <button class="btn btn-primary send-btn">Send</button>
+    </div> -->
+    <!-- <div class="button-group">
+      <button class="btn btn-primary send-btn">Back</button>
+      <button class="btn btn-primary send-btn">Send</button>
+    </div> -->

@@ -1,0 +1,103 @@
+<!-- <div class="main-panel">
+    <div class="container">
+        <div class="card">
+            <h2 class="title">Google Sheet URL</h2>
+
+            <ng-select [items]="sheetOptions" bindLabel="label" [(ngModel)]="sheetUrl" placeholder="Paste or select URL"
+                [searchable]="true" [addTag]="true" (change)="onSheetUrlChange($event)">
+            </ng-select>
+
+            <div *ngIf="showNewForm" class="form-section">
+
+                <label class="label">Select Sheet</label>
+                <ng-select [items]="sheetNames" [(ngModel)]="selectedSheet" placeholder="Select Sheet">
+                </ng-select>
+
+                <label class="label">Select Rows</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="rowOption" value="all" [(ngModel)]="rowOption" /> Send to All
+                    </label>
+                    <label>
+                        <input type="radio" name="rowOption" value="selected" [(ngModel)]="rowOption" /> Send to
+                        Selected
+                    </label>
+                </div>
+
+                <div class="recipient-info">
+                    {{ recipientCount }} Recipients selected
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-back">Back</button>
+                <button class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+   -->
+
+<div class="main-panel">
+    <div class="container">
+        <h3 class="title">Google Sheet URL</h3>
+
+        <!-- Step 1: URL Entry -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Paste Google Sheet URL</mat-label>
+            <input matInput [(ngModel)]="sheetUrl" (blur)="onUrlEntered()" />
+        </mat-form-field>
+
+        <!-- Step 2: Sheet & Column Selection -->
+        <div *ngIf="sheetLoaded">
+            <!-- Sheet Name (manual entry) -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Sheet Name</mat-label>
+                <input matInput [(ngModel)]="manualSheetName" />
+            </mat-form-field>
+
+            <!-- Select Sheet -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Select Sheet</mat-label>
+                <mat-select [(ngModel)]="selectedSheet">
+                    <mat-option *ngFor="let sheet of availableSheets" [value]="sheet">
+                        {{ sheet }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Select Rows -->
+            <div class="row-select">
+                <label>Select Rows</label>
+                <mat-radio-group [(ngModel)]="sendTo" class="radio-row">
+                    <mat-radio-button value="all">Send to All</mat-radio-button>
+                    <mat-radio-button value="selected">Send to Selected</mat-radio-button>
+                </mat-radio-group>
+
+                <div class="row-inputs" *ngIf="sendTo === 'selected'">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Start row number</mat-label>
+                        <input matInput type="number" [(ngModel)]="startRow" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>End row number</mat-label>
+                        <input matInput type="number" [(ngModel)]="endRow" />
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- Recipient count -->
+            <p class="recipient-count" *ngIf="recipientCount > 0">
+                {{ recipientCount }} Recipients selected
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+    </div>
+    <div class="action-buttons">
+        <button mat-stroked-button color="primary" (click)="goBack()">Back</button>
+        <button mat-flat-button color="primary" (click)="goNext()">Next</button>
+    </div>
+</div>
+  

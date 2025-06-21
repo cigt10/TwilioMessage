@@ -1,0 +1,41 @@
+<!-- <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/> -->
+<!-- <div class="sidebar">
+    <button class="input-source-btn"(click)="selectPanel('paste')">Manual Entry</button>
+    <button class="input-source-btn"(click)="selectPanel('excel')">Excel Upload</button>
+    <button class="input-source-btn">Google Sheets</button>
+    <button class="input-source-btn">CSV, Other Formats</button>
+    <button class="input-source-btn">Saved Contacts</button>
+</div> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="sidebar">
+  <h3 class="sidebar-title">Input Source</h3>
+
+  <button class="input-source-btn"(click)="selectPanel('paste')">
+    <i class="fa-solid fa-pen"></i>
+    Copy/Paste
+  </button>
+
+  <button class="input-source-btn"(click)="selectPanel('excel')">
+    <i class="fa-solid fa-file-excel"></i>
+    Excel Sheets
+  </button>
+
+  <button class="input-source-btn" (click)="selectPanel('google')">
+    <i class="fa-brands fa-google-drive"></i>
+    Google Sheets
+  </button>
+
+  <button class="input-source-btn">
+    <i class="fa-solid fa-file-csv"></i>
+    CSV, Other Formats
+  </button>
+
+  <button class="input-source-btn">
+    <i class="fa-regular fa-address-book"></i>
+    Saved Contacts
+  </button>
+</div>

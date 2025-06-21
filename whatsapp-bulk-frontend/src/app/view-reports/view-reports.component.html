@@ -1,0 +1,51 @@
+<div class="report-container">
+  <h2 class="report-title">Message Reports</h2>
+
+  <div class="text-end mb-3">
+    <button class="btn btn-outline-dark refresh-btn" (click)="refreshReports()">
+      <span class="material-icons me-1">refresh</span> Refresh
+    </button>
+  </div>
+
+  <table *ngIf="campaignReports.length; else noData" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Campaign Name</th>
+        <th>Attachment</th>
+        <th>Sent</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let report of campaignReports" (click)="viewDetails(report.msgId)">
+        <td>{{ report.campaignName }}</td>
+
+        <td>
+          <ng-container *ngIf="report.attachmentName; else noAttachment">
+            <span class="material-icons text-muted align-middle me-1">image</span>
+            {{ report.attachmentName }}
+          </ng-container>
+          <ng-template #noAttachment>
+            <span class="text-muted">N/A</span>
+          </ng-template>
+        </td>
+
+        <td>0/{{ report.count }}</td>
+
+        <td>
+          <span class="badge" [ngClass]="{
+                  'status-completed': report.status === 'Completed',
+                  'status-canceled': report.status === 'Canceled',
+                  'status-partial': report.status === 'Partial'
+                }">
+            {{ report.status }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noData>
+    <div class="empty-message">⚠️ No report data yet.</div>
+  </ng-template>
+</div>

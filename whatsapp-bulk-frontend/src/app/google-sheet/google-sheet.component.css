@@ -1,0 +1,129 @@
+/* Container to center content vertically and horizontally */
+/* .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+} */
+
+/* Card box styling */
+/* .card {
+    width: 500px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
+    max-height: 400px;
+    min-height: 400px;
+}
+
+
+.title {
+    font-size: 24px;
+    margin-bottom: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.radio-group {
+    margin-top: 10px;
+    display: flex;
+    gap: 20px;
+}
+
+.recipient-info {
+    margin-top: 15px;
+    color: #1a73e8;
+    font-weight: 500;
+}
+
+.button-group {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn {
+    padding: 8px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-back {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-next {
+    background-color: #1a73e8;
+    color: white; } */
+
+    .main-panel {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        max-height: 400px;
+        min-height: 390px;
+        background: #ffffff;
+        padding: 10px;
+        width: 500px;
+        max-width: 100%;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        font-family: 'Segoe UI', sans-serif;   }
+    
+        .container {
+            padding: 0 16px;
+        }
+    
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+    
+        .full-width {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+    
+        .row-select {
+            margin-top: 16px;
+        }
+    
+        .radio-row {
+            display: flex;
+            gap: 24px;
+            margin: 8px 0;
+            align-items: center;
+        }
+    
+        .row-inputs {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+    
+        .recipient-count {
+            color: #1a73e8;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+    
+                .action-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 16px;
+                    position: sticky;
+                    bottom: 0;
+                    background-color: white;
+                    /* Or match your background */
+                    border-top: 1px solid #ccc;       }

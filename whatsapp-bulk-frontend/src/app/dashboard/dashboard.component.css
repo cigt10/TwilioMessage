@@ -1,0 +1,114 @@
+body {
+    background-color: #f3f5f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main Card */
+.container {
+    max-width: 800px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: center;
+    height: 400px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e6f0; 
+    padding-bottom: 0.5rem;
+}
+
+.header img {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+}
+
+.header h2 {
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.badge {
+    background-color: #ff9f00;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-left: auto;
+}
+
+/* Subtext */
+.subtext {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 0.5rem;
+}
+
+/* Button */
+.send-btn {
+    background-color: #2f76f3;
+    border: none;
+    color: white;
+    padding: 12px 28px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+.send-btn:hover {
+    background-color: #1e5de9;
+    
+}
+.more{
+    text-align: left;
+}
+/* Tool Section */
+.tools {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.tool-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e6f0;
+    padding: 1.2rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tool-card:hover {
+    background-color: #f1f7ff;
+    transform: translateY(-3px);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: #888;
+}

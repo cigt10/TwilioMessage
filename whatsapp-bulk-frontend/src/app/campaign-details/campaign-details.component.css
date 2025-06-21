@@ -1,0 +1,55 @@
+.report-container {
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .report-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .report-table th,
+  .report-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .status-badge.sent {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .status-badge.failed {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .empty-message {
+    text-align: center;
+    font-style: italic;
+    color: #6b7280;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    background-color: #f9fafb;
+  }
+  

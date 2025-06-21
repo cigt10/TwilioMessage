@@ -1,0 +1,87 @@
+<!-- WRITE MESSAGE FORM -->
+<div *ngIf="!creatingTemplate" class="modal-box">
+    <h3 class="modal-title">Write Message</h3>
+
+    <!-- Dropdown -->
+    <div class="dropdown-wrapper" (mouseenter)="hoveringDropdown = true" (mouseleave)="hoveringDropdown = false">
+        <div class="template-selector">
+            <label class="template-label">Select or Create Template</label>
+        
+            <div class="template-input-wrapper">
+                <input type="text" placeholder="Select or Create Template" [value]="getSelectedTemplateName()" readonly
+                    (click)="toggleDropdown()" class="template-input" />
+        
+                <button *ngIf="getSelectedTemplateName()" class="clear-button" (click)="clearTemplate()">
+                    ×
+                </button>
+        
+                <span class="dropdown-icon" (click)="toggleDropdown()">▾</span>
+            </div>
+        </div>          
+
+        <div class="dropdown-list" *ngIf="dropdownOpen">
+            <div class="dropdown-item" *ngFor="let template of templates" (click)="selectTemplate(template)"
+                (mouseenter)="hoveredTemplateId = template.templateId" (mouseleave)="hoveredTemplateId = null">
+                <span>{{ template.templateName }}</span>
+                <div class="icon-group" *ngIf="hoveredTemplateId === template.templateId">
+                    <span class="icon-btn" (click)="editTemplate(); $event.stopPropagation()">✎</span>
+                    <span class="icon-btn"
+                        (click)="deleteTemplate(); $event.stopPropagation()">❌</span>
+                </div>
+            </div>
+            <div class="create-template" (click)="startCreatingTemplate()">+ Create Template</div>
+        </div>
+    </div>
+
+    <!-- Message Box -->
+    <div class="editor-container">
+        <quill-editor
+          [(ngModel)]="message"
+          [modules]="editorModules"
+          [styles]="{ height: '200px' }"
+          theme="snow"
+          placeholder="Type here...">
+        </quill-editor>
+      
+        <!-- Trigger button -->
+        <button mat-button [matMenuTriggerFor]="variableMenu">+ Variables</button>
+        
+        <!-- Dropdown menu -->
+        <mat-menu #variableMenu="matMenu">
+            <button mat-menu-item *ngFor="let col of excelColumns" (click)="insertVariable(col)">
+                {{ col }}
+            </button>
+        </mat-menu>
+    </div>
+
+      
+    <!-- <div class="message-editor-container">
+        <quill-editor [(ngModel)]="message" [styles]="{height: '200px'}" [modules]="editorModules"
+            placeholder="Write your message...">
+        </quill-editor>
+    </div>       -->
+
+    <!-- Submit Button -->
+    <button class="btn-primary" (click)="onDone()">Done</button>
+</div>
+    
+<!-- CREATE TEMPLATE FORM -->
+<div *ngIf="creatingTemplate" class="modal-box">
+    <h3 class="modal-title">Create New Template</h3>
+    <input type="text" class="input-field" placeholder="Template Name" [(ngModel)]="newTemplateName" />
+    <div class="editor-container">    
+        <quill-editor [(ngModel)]="message" [modules]="editorModules" [styles]="{ height: '200px' }" theme="snow"
+            placeholder="Type here...">
+        </quill-editor>
+    
+        <div class="toolbar-footer">
+            <button class="toolbar-variable" (click)="insertVariable('{{name}}')">+ Variables</button>
+        </div>
+    </div>
+
+    <div class="action-row">
+        <button class="btn-secondary" (click)="cancelCreatingTemplate()">Back</button>
+        <button class="btn-primary" (click)="saveNewTemplate()">Save</button>
+    </div>
+</div>
+  

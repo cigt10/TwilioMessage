@@ -1,0 +1,38 @@
+<div class="report-container">
+
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-link me-2" (click)="goBack()">←</button>
+        <h2 class="report-title mb-0">Campaign Message Report</h2>
+    </div>
+
+    <table *ngIf="logs.length; else empty" class="report-table table table-striped">
+        <thead>
+            <tr>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Message</th>
+                <th>Sent At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let log of logs">
+                <td>{{ log.phoneNumber }}</td>
+                <td>
+                    <span class="status-badge" [ngClass]="{
+            'sent': log.status === 'sent',
+            'failed': log.status === 'Failed'
+            }">{{ log.status }}</span>
+                </td>
+                <td style="white-space: pre-line;" [title]="convertHtml(log.message)">{{ getShortMessage(log.message, 25) }}
+                </td>
+                <td>{{ log.sentAt | date:'short' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ng-template #empty>
+        <div class="empty-message">⚠️ No message logs for this campaign.</div>
+    </ng-template>
+
+</div>
+  

@@ -1,0 +1,161 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<div class="main-panel">
+    <div *ngIf="step === 'form'">
+    <div class="form-group">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="mb-0">Numbers ({{ numbers.length }})</label>
+            <span class="material-icons ripple-icon" (click)="clearNumbers()">delete</span>
+        </div>
+    
+        <div class="d-flex">
+            <select class="form-select me-2" style="max-width: 80px;" [(ngModel)]="countryCode">
+                <option *ngFor="let code of countryCodes" [value]="code.value">
+                    {{ code.label }}
+                </option>
+            </select>          
+    
+            <div class="flex-grow-1 input-area">
+                <div class="chips-box">
+                    <span class="chip" *ngFor="let num of numbers; let i = index">
+                        {{ countryCode + num }}
+                        <span class="remove-chip" (click)="removeNumber(i)">×</span>
+                    </span>
+                    <input type="text" class="form-control border-0 shadow-none" [(ngModel)]="numbersInput" (keyup.enter)="addNumber()"
+                        (keypress)="allowOnlyNumbersAndPlus($event)" placeholder="Add numbers here..."
+                        [ngClass]="{ 'is-invalid': numberError }" />
+                    <div *ngIf="numberError" class="invalid-feedback d-block">
+                        {{ numberError }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="message" class="left">Message Settings</label>
+        <label class="checkbox-group">
+            <input type="checkbox" [(ngModel)]="showAttachments" />
+            Add Attachments
+        </label>
+
+        <div *ngIf="showAttachments && selectedFiles.length === 0" class="attachment-options">
+            <!-- IMAGE -->
+            <div class="option" (click)="triggerFileSelect('image')">
+                <div class="circle blue">
+                    <span class="material-icons">photo_camera</span>
+                </div>
+                <div class="label">Image</div>
+                <input type="file" accept="image/*" #imageInput hidden (change)="handleFile($event, 'Image')" />
+            </div>
+        
+            <!-- VIDEO -->
+            <div class="option" (click)="triggerFileSelect('video')">
+                <div class="circle blue">
+                    <span class="material-icons">videocam</span>
+                </div>
+                <div class="label">Video</div>
+                <input type="file" accept="video/*" #videoInput hidden (change)="handleFile($event, 'Video')" />
+            </div>
+        
+            <!-- DOCUMENT -->
+            <div class="option" (click)="triggerFileSelect('document')">
+                <div class="circle blue">
+                    <span class="material-icons">insert_drive_file</span>
+                </div>
+                <div class="label">Document</div>
+                <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" #docInput hidden
+                    (change)="handleFile($event, 'Document')" />
+            </div>
+        
+            <!-- DISABLED OPTION -->
+            <div class="option disabled">
+                <div class="circle gray">
+                    <span class="material-icons">poll</span>
+                </div>
+                <div class="label gray">Poll</div>
+            </div>
+        </div>
+        
+        <div class="file-preview" *ngFor="let fileItem of selectedFiles; let i = index">
+            <div class="preview-left">
+                <div class="preview-left-top">
+                    <span class="material-icons file-icon">
+                        {{
+                        fileItem.type === 'image'
+                        ? 'photo_camera'
+                        : fileItem.type === 'video'
+                        ? 'videocam'
+                        : 'insert_drive_file'
+                        }}
+                    </span>
+                    <span class="file-name">{{ fileItem.file.name }}</span>
+                    <span class="file-size">• {{ (fileItem.file.size / 1024 / 1024).toFixed(2) }} MB</span>
+                </div>
+                <span class="error" *ngIf="fileItem.error">{{ fileItem.error }}</span>
+            </div>
+        
+            <div class="preview-right">
+                <span class="remove-btn" (click)="removeFile(i)">&#x2716;</span>
+            </div>
+        </div>                    
+
+        <label class="checkbox-group">
+            <input type="checkbox" [(ngModel)]="enableDelay" />
+            Send random time-gap of up to
+            <input type="number" [(ngModel)]="timeGap" class="time-gap-input" min="0" /> seconds.
+        </label>
+    </div>
+    <div class="form-group" [ngClass]="{ 'has-error': messageError }">
+        <label for="message" class="left">Type your Message here</label>
+        <textarea placeholder="Write here ..." [(ngModel)]="message" name="message" class="form-control message-box"
+            (blur)="validateMessage()"></textarea>
+    
+        <div class="error-message" *ngIf="messageError">
+            Message is required.
+        </div>
+    </div>      
+
+    <div class="button-group">
+        <button class="btn btn-primary send-btn" (click)="goHome()">Back</button>
+        <button class="btn btn-primary send-btn" (click)="sendMessages()">Send</button>
+    </div>
+</div>
+<div *ngIf="step === 'processing'" class="text-center mt-5">
+    <div class="spinner-circle mx-auto mb-3">
+        <span *ngIf="!isPaused" class="spinner-border text-primary" style="width: 64px; height: 64px;"></span>
+        <span *ngIf="isPaused" class="material-icons text-primary" style="font-size: 64px;">pause</span>
+    </div>
+
+    <h4>{{ sentCount + notSentCount }} / {{ totalCount }} records processed</h4>
+    <p>
+        <span class="text-success">{{ sentCount }} : Sent</span> |
+        <span class="text-danger">{{ notSentCount }} : Not Sent</span>
+    </p>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-outline-danger me-2" (click)="cancelProcess()">Cancel</button>
+
+        <!-- Pause/Resume Button -->
+        <button *ngIf="!isPaused" class="btn btn-primary" (click)="pauseProcess()">Pause</button>
+        <button *ngIf="isPaused" class="btn btn-primary" (click)="resumeProcess()">Resume</button>
+    </div>
+</div>  
+
+<!-- Final Result View -->
+<div *ngIf="step === 'result'" class="text-center mt-5">
+    <span class="material-icons text-success" style="font-size: 64px;">check_circle</span>
+    <h4>{{ result.deliverMsgCount + result.unDeliverMsgCount }} / {{ result.deliverMsgCount }} records processed</h4>
+    <p>
+        <span class="text-success">{{ result.deliverMsgCount }} : Sent</span> |
+        <span class="text-danger">{{ result.unDeliverMsgCount }} : Not Sent</span>
+    </p>
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-primary me-2" (click)="openReport()">View Report</button>
+        <button class="btn btn-outline-primary" (click)="goHome()">Home</button>
+    </div>
+</div>  
+</div>  

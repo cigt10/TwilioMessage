@@ -7,15 +7,20 @@ import * as XLSX from 'xlsx';
 import { ViewChild, ElementRef } from '@angular/core';
 import { WhatsAppService } from '../whatsapp.service';
 import { WhatsAppRequest } from '../models/whatsapp-request';
-import { COUNTRY_CODES } from '../country-code-dialog/country-code-dialog.component';
+import { COUNTRY_CODES } from '../shared/constants';
 import { WhatsAppMsgResponse } from '../models/whats-app-msg-response';
+import { TemplateMessageComponent } from '../template-message/template-message.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MessageService } from '../shared/message.service';
+
+
 @Component({
   selector: 'app-manual-entry',
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './manual-entry.component.html',
   styleUrl: './manual-entry.component.css'
 })
-export class ManualEntryComponent {
+export class ManualEntryComponent implements OnInit {
   showAttachments = false;
   enableDelay = true;
   timeGap = 30;
@@ -29,7 +34,9 @@ export class ManualEntryComponent {
   result: WhatsAppMsgResponse = {
     message: '',
     deliverMsgCount: 0,
-    unDeliverMsgCount: 0
+    unDeliverMsgCount: 0,
+    errorMessage: ''
+
   };
   whatsAppRequest: WhatsAppRequest = {
     encodedPhoneNumbers: '',
@@ -46,7 +53,20 @@ export class ManualEntryComponent {
   notSentCount = 0;
   totalCount = 0;
   isPaused: boolean = false;
-
+  //
+  customMessage: string = '';
+  selectedTemplateName: string = '';
+  selectedMessageField: string = '';
+  templateName: string = '';
+  // error message
+  errorMessage: string = '';
+  //
+  ngOnInit(): void {
+    // this.messageService.message$.subscribe(msg => this.customMessage = msg ?? '');
+    // this.messageService.templateName$.subscribe(name => this.templateName = name ?? '');
+    
+  }
+  
 
   allowOnlyNumbersAndPlus(event: KeyboardEvent) {
     const allowedChars = /[0-9+]/;
@@ -130,7 +150,7 @@ export class ManualEntryComponent {
   validateMessage() {
     this.messageError = !this.message || this.message.trim() === '';
   }
-  constructor(private service: WhatsAppService, private router: Router) { }
+  constructor(private service: WhatsAppService, private messageService: MessageService, private router: Router,private dialog: MatDialog) { }
   sendMessages() {
     // ✅ Validate that at least one valid number is added
     if (this.numbers.length === 0) {
@@ -139,8 +159,8 @@ export class ManualEntryComponent {
     }
   
     // ✅ Validate message
-    this.validateMessage();
-    if (this.messageError) return;
+    // this.validateMessage();
+    // if (this.messageError) return;
   
     const formData = new FormData();
   
@@ -148,8 +168,18 @@ export class ManualEntryComponent {
     const fullNumbers = this.numbers.map(num => this.countryCode + num)
     const encodedPhoneNumbers = btoa(fullNumbers.join(','));
     formData.append('EncodedPhoneNumbers', encodedPhoneNumbers);
-    formData.append('Message', this.message || '');
+    formData.append('Message', this.customMessage || '');
   
+    // data source
+
+    formData.append('DataSource', 'Copy-Paste');
+    // ✅ Set message source based on template usage
+    const templateName = this.getTemplateName();
+    const isTemplateUsed = templateName !== 'Write Message Here';
+    formData.append('MessageSource', isTemplateUsed ? 'Template' : 'Written');
+
+    // ✅ Attach files
+
     if (this.whatsAppRequest.files) {
       for (let file of this.whatsAppRequest.files) {
         formData.append('Files', file);
@@ -166,7 +196,8 @@ export class ManualEntryComponent {
       this.result = res;
       this.isOn = true;
       this.sentCount = res.deliverMsgCount;
-    this.notSentCount = res.unDeliverMsgCount;
+      this.notSentCount = res.unDeliverMsgCount;
+      this.errorMessage = res.errorMessage;
 
     // ✅ Show result
     this.processing = false;
@@ -193,5 +224,41 @@ export class ManualEntryComponent {
     const url = this.router.serializeUrl(this.router.createUrlTree(['/report']));
     window.open(url, '_blank');
   }
+  //  Template Message 
+
+  goToTemplateMessage() {
+      const dialogRef = this.dialog.open(TemplateMessageComponent, {
+        width: '500px',
+        disableClose: true,
+        data: {
+          message: this.customMessage,
+          excelColumns: [],
+          templateName: this.selectedTemplateName          
+          // excelColumns: this.excelColumns
+        }
+      });
+  
+      dialogRef.afterClosed().subscribe((result: { message: string, templateName: string }) => {
+        if (result) {
+          this.customMessage =result.message;
+          this.selectedTemplateName = result.templateName;
+          this.selectedMessageField = ''; // Disable Excel column if custom message used
+        }
+      });
+  }
+  clearMessage(event: MouseEvent) {
+    event.stopPropagation(); // prevent box click
+    this.selectedTemplateName = '';
+    this.customMessage = '';
+  }
+   getTemplateName(): string {
+   return this.selectedTemplateName || 'Write Message Here';
+  }  
+  clearTemplateName(event: Event) {
+    event.stopPropagation();
+    this.selectedTemplateName = '';
+    this.customMessage = ''; // optionally clear the message too
+  }
+  
 }
 

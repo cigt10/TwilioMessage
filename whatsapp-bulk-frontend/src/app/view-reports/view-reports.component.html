@@ -17,18 +17,18 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let report of campaignReports" (click)="viewDetails(report.msgId)">
+      <tr *ngFor="let report of campaignReports" (click)="viewDetails(report.campaignId.toString())">
         <td>{{ report.campaignName }}</td>
 
         <td>
           <ng-container *ngIf="report.attachmentName; else noAttachment">
-            <span class="material-icons text-muted align-middle me-1">image</span>
+            <span class="material-icons text-muted align-middle me-1">attachment</span>
             {{ report.attachmentName }}
           </ng-container>
           <ng-template #noAttachment>
             <span class="text-muted">N/A</span>
           </ng-template>
-        </td>
+        </td>        
 
         <td>0/{{ report.count }}</td>
 

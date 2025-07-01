@@ -37,6 +37,7 @@ export class HtmlUtilsService {
         return plain.length > maxLength
           ? plain.slice(0, maxLength) + '...'
           : plain;
-      }      
+  } 
+  
 
 }

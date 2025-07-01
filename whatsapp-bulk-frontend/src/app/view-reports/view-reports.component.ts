@@ -30,7 +30,7 @@ export class ViewReportsComponent implements OnInit {
 
   viewDetails(msgId: string): void {
     if (msgId) {
-      this.router.navigate(['/campaign-details'], { queryParams: { msgId } });
+      this.router.navigate(['/campaign-details'], { queryParams: { campaignId: msgId } });
     } else {
       console.warn('Missing msgId for campaign.'); // ✅ check if msgId is present
     }

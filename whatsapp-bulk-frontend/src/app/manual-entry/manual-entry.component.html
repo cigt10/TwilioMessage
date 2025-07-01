@@ -14,7 +14,7 @@
         <div class="d-flex">
             <select class="form-select me-2" style="max-width: 80px;" [(ngModel)]="countryCode">
                 <option *ngFor="let code of countryCodes" [value]="code.value">
-                    {{ code.label }}
+                    {{ code.value }}
                 </option>
             </select>          
     
@@ -36,12 +36,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="message" class="left">Message Settings</label>
-        <label class="checkbox-group">
-            <input type="checkbox" [(ngModel)]="showAttachments" />
-            Add Attachments
-        </label>
-
+        <div class="left">
+            <label for="message" class="left">Message Settings</label>
+            <label class="checkbox-group">
+                <input type="checkbox" [(ngModel)]="showAttachments" />
+                Add Attachments
+                </label>
+        </div>
         <div *ngIf="showAttachments && selectedFiles.length === 0" class="attachment-options">
             <!-- IMAGE -->
             <div class="option" (click)="triggerFileSelect('image')">
@@ -102,23 +103,15 @@
                 <span class="remove-btn" (click)="removeFile(i)">&#x2716;</span>
             </div>
         </div>                    
-
-        <label class="checkbox-group">
-            <input type="checkbox" [(ngModel)]="enableDelay" />
-            Send random time-gap of up to
-            <input type="number" [(ngModel)]="timeGap" class="time-gap-input" min="0" /> seconds.
-        </label>
     </div>
-    <div class="form-group" [ngClass]="{ 'has-error': messageError }">
-        <label for="message" class="left">Type your Message here</label>
-        <textarea placeholder="Write here ..." [(ngModel)]="message" name="message" class="form-control message-box"
-            (blur)="validateMessage()"></textarea>
+    <div class="message-settings-row">
+        <label for="message">Message </label>
     
-        <div class="error-message" *ngIf="messageError">
-            Message is required.
-        </div>
+        <button class="custom-button" (click)="goToTemplateMessage()">
+            {{ getTemplateName() }}
+            <span *ngIf="selectedTemplateName" class="clear-inside" (click)="clearTemplateName($event)">×</span>
+        </button>
     </div>      
-
     <div class="button-group">
         <button class="btn btn-primary send-btn" (click)="goHome()">Back</button>
         <button class="btn btn-primary send-btn" (click)="sendMessages()">Send</button>
@@ -133,7 +126,8 @@
     <h4>{{ sentCount + notSentCount }} / {{ totalCount }} records processed</h4>
     <p>
         <span class="text-success">{{ sentCount }} : Sent</span> |
-        <span class="text-danger">{{ notSentCount }} : Not Sent</span>
+        <span class="text-danger">{{ notSentCount }} : Not Sent</span> |
+        <span>{{errorMessage}} : Error</span>
     </p>
 
     <div class="d-flex justify-content-center mt-4">
@@ -152,6 +146,8 @@
     <p>
         <span class="text-success">{{ result.deliverMsgCount }} : Sent</span> |
         <span class="text-danger">{{ result.unDeliverMsgCount }} : Not Sent</span>
+        <span>{{result.errorMessage}} : Error</span>
+
     </p>
     <div class="d-flex justify-content-center mt-4">
         <button class="btn btn-primary me-2" (click)="openReport()">View Report</button>

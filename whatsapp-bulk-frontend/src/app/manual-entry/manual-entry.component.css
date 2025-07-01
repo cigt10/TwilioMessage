@@ -127,8 +127,9 @@ input[type="checkbox"] {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
-    font-weight: 500;
+    font-weight: normal !important;
     color: #333;
+    font-size: 14px;
 }
 
 .time-gap-input {
@@ -374,6 +375,45 @@ input[type="checkbox"] {
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
+.message-settings-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* space between label and button */
+    margin-bottom: 16px;
+    /* optional spacing below the row */
+}
+
+.custom-button {
+    position: relative;
+    padding: 10px 36px 10px 16px;
+    border: 1px solid #d6d8da;
+    background-color: white;
+    color: #1976d2;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 220px;
+    width: 350px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    margin-left: 20px;
+}
+
+.clear-inside {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #df2020;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1;
+}
 
 @keyframes spin {
     to {
@@ -455,5 +495,6 @@ input[type="checkbox"] {
     }
     .left{
         text-align: left!important;
+        justify-content: flex-start!important;
     }
 }

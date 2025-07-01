@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { QuillModule } from 'ngx-quill';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MessageService } from '../shared/message.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -32,23 +34,31 @@ export class TemplateMessageComponent implements OnInit {
   hoveringDropdown: boolean = false;
   selectedTemplate: string | null = null;
   selectedTemplateName: string = '';
+  templateName: string = '';
 
   excelColumns: string[] = [];
 
-  constructor(private templateService: TemplateService,public dialogRef: MatDialogRef<TemplateMessageComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { message: string, excelColumns: string[] }
+  constructor(private templateService: TemplateService,   private messageService: MessageService,
+    public dialogRef: MatDialogRef<TemplateMessageComponent>, private router: Router,
+    @Inject(MAT_DIALOG_DATA) public data: { message: string, excelColumns: string[] ,templateName: string}
   ) {
     this.message = data.message || '';
     this.excelColumns = data.excelColumns || []; // ✅ Initialize from dialog data
+    this.selectedTemplateName = data.templateName || ''; // ✅ Initialize from dialog data
   }
   onTemplateSelect(template: any) {
     this.message = template.content; // or template.message
-    this.selectedTemplateName = template.name; // store actual name
+    this.selectedTemplate = template.name; // store actual name
   }  
   onDone() {
+    // this.messageService.setMessage(this.message);
+    // this.messageService.setTemplateName(this.selectedTemplateName || 'Template  Message');
+    // this.router.navigate(['']);
     this.dialogRef.close({
       message: this.message,
-      templateName: this.selectedTemplateName || 'Template Message'
+      templateName: this.selectedTemplateName || 'Whatsapp Message'
+      // templateName: this.templateName || 'Whatsapp Message'
+
     });
   }
   
@@ -83,6 +93,7 @@ export class TemplateMessageComponent implements OnInit {
   clearTemplate(): void {
     this.selectedTemplateId = null;
     this.message = '';
+    this.templateName = '';
   }
 
   cancelCreateEdit(): void {
@@ -92,15 +103,13 @@ export class TemplateMessageComponent implements OnInit {
     this.message = '';
   }
 
-  editTemplate(): void {
-    const selected = this.templates.find(t => t.templateId === +this.selectedTemplateId!);
-    if (selected) {
-      this.creatingTemplate = true;
-      this.isEditing = true;
-      this.newTemplateName = selected.templateName;
-      this.message = selected.templateMessage;
-    }
-  }
+  editTemplate(template: any): void {
+    this.creatingTemplate = true;
+    this.isEditing = true;
+    this.newTemplateName = template.templateName;
+    this.message = template.templateMessage;
+    this.selectedTemplateId = template.templateId;
+  }  
 
   saveNewTemplate(): void {
     if (!this.newTemplateName.trim() || !this.message.trim()) {
@@ -127,15 +136,15 @@ export class TemplateMessageComponent implements OnInit {
     }
   }
 
-  deleteTemplate(): void {
-    if (this.selectedTemplateId && confirm('Are you sure you want to delete this template?')) {
-      this.templateService.deleteTemplate(this.selectedTemplateId).subscribe(() => {
-        this.selectedTemplateId = null;
+  deleteTemplate(templateId: number): void {
+    if (confirm('Are you sure you want to delete this template?')) {
+      this.templateService.deleteTemplate(templateId).subscribe(() => {
         this.message = '';
+        this.selectedTemplateId = null;
         this.loadTemplates();
       });
     }
-  }
+  }  
 
   submitMessage(): void {
     console.log("Submitted message:", this.message);
@@ -167,5 +176,8 @@ export class TemplateMessageComponent implements OnInit {
   }
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
+  }
+  closeModal() {
+    this.dialogRef.close();
   }
 }

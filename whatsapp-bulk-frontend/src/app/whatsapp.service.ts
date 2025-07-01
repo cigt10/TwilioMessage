@@ -47,6 +47,7 @@
 //   }
 // }
 // export interface WhatsAppMsgResponse {
+//   errormessage: string;
 //   message: string;
 //   deliverMsgCount: number;
 //   unDeliverMsgCount: number;
@@ -54,20 +55,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-export interface WhatsAppMsgResponse {
-  message: string;
-  deliverMsgCount: number;
-  unDeliverMsgCount: number;
-}
-
-export interface WhatsAppMessageLog {
-  msgId: string;
-  phoneNumber: string;
-  message: string;
-  status: string;
-  sentAt: Date; // ✅ Correctly defined as Date
-}
+import { WhatsAppMessageLog } from './models/whatsapp-message-log';
+import { WhatsAppMsgResponse } from './models/whats-app-msg-response';
 
 @Injectable({
   providedIn: 'root'
@@ -76,15 +65,11 @@ export class WhatsAppService {
   private apiUrl = 'https://localhost:44338/sendmessage';
   private reportUrl = 'https://localhost:44338/reports';
   private campaignReportUrl = 'https://localhost:44338/reports/campaigns';
-  private campaignDetailsUrl = 'https://localhost:44338/reports/by-campaign';
+  private campaignDetailsUrl = 'https://localhost:44338/reports/campaigns';
 
   constructor(private http: HttpClient) {}
 
   sendBulkMessage(formData: FormData) {
-    // const body = {
-    //   encodedPhoneNumbers: btoa(numbers.join(',')),
-    //   message: message,
-    // };
     return this.http.post<WhatsAppMsgResponse>(this.apiUrl, formData);
   }
 
@@ -95,8 +80,8 @@ export class WhatsAppService {
     return this.http.get<any[]>(this.campaignReportUrl);
   }
   
-  getCampaignDetails(msgId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.campaignDetailsUrl}/${msgId}`);
+  getCampaignDetails(campaignId: string): Observable<{ campaign: any, logs: any[] }> {
+    return this.http.get<{ campaign: any, logs: any[] }>(`${this.campaignDetailsUrl}/${campaignId}/details`);
   }
   
 }

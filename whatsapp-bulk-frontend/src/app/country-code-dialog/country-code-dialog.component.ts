@@ -58,9 +58,4 @@ export class CountryCodeDialogComponent {
     });
   }
 }
-export const COUNTRY_CODES = [
-  { label: 'India (+91)', value: '+91' },
-  { label: 'US (+1)', value: '+1' },
-  { label: 'UK (+44)', value: '+44' },
-];
 

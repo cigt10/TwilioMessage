@@ -3,5 +3,9 @@ export interface WhatsAppMessageLog {
     phoneNumber: string;
     message: string;
     status: string;
-    sentAt: Date; // or Date
-}  
+    sentAt: Date; 
+    files: string;
+    campaignName: 'My WhatsApp Campaign',
+    dataSource: 'Excel Sheet',     
+    messageSource: 'Typed Message'
+}

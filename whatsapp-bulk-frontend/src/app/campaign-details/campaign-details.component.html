@@ -1,38 +1,105 @@
-<div class="report-container">
-
-    <div class="d-flex align-items-center mb-3">
-        <button class="btn btn-link me-2" (click)="goBack()">←</button>
-        <h2 class="report-title mb-0">Campaign Message Report</h2>
-    </div>
-
-    <table *ngIf="logs.length; else empty" class="report-table table table-striped">
-        <thead>
-            <tr>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Message</th>
-                <th>Sent At</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let log of logs">
-                <td>{{ log.phoneNumber }}</td>
-                <td>
-                    <span class="status-badge" [ngClass]="{
-            'sent': log.status === 'sent',
-            'failed': log.status === 'Failed'
-            }">{{ log.status }}</span>
-                </td>
-                <td style="white-space: pre-line;" [title]="convertHtml(log.message)">{{ getShortMessage(log.message, 25) }}
-                </td>
-                <td>{{ log.sentAt | date:'short' }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <ng-template #empty>
-        <div class="empty-message">⚠️ No message logs for this campaign.</div>
-    </ng-template>
-
+<div class="d-flex align-items-center mb-4">
+    <button class="btn btn-outline-secondary me-2" (click)="goBack()">←</button>
+    <h4 class="fw-bold text-dark mb-0">
+        Campaign on {{ campaign?.createdAt | date: 'MMM d, yy at h:mm a' }}
+    </h4>
 </div>
-  
+
+<h5 class="fw-semibold mb-3">Campaign Details</h5>
+<div class="card shadow-sm p-4 mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Created At :</strong> {{ campaign?.createdAt | date:'MMM d, yyyy | hh:mm a' }}</p>
+            <p><strong>Completed At :</strong> {{ campaign?.completedAt | date:'MMM d, yyyy | hh:mm a' }}</p>
+            <p><strong>Attachment :</strong>
+                <span class="text-muted">{{ campaign?.attachment || 'N/A' }}</span>
+            </p>
+            <p><strong>Attachment Size :</strong>
+                <span class="text-muted">{{ campaign?.attachmentSize ? (campaign.attachmentSize | number:'1.3-3') + ' MB' : 'N/A'
+                    }}</span>
+            </p>
+            <p><strong>Sent :</strong> {{ sentCount }}/{{ logs.length }}</p>
+            <p><strong>Status :</strong>
+                <span class="badge" [ngClass]="{
+                  'bg-success text-white': campaign?.status === 'Completed',
+                  'bg-warning text-dark': campaign?.status === 'Partial' || campaign?.status === 'Canceled',
+                  'bg-danger text-white': campaign?.status === 'Failed'
+                }">
+                    {{ campaign?.status }}
+                </span>
+            </p>
+        </div>
+
+        <div class="col-md-6">
+            <p><strong>Data Source :</strong> {{ campaign?.dataSource || 'N/A' }}</p>
+            <p><strong>Message Source :</strong> {{ campaign?.messageSource || 'N/A' }}</p>
+            <p><strong>Country Code Settings :</strong> Common</p>
+        </div>
+    </div>
+</div>
+
+<!-- Campaign Status Section -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Campaign Status</h5>
+    <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <mat-icon class="align-middle" >filter_alt</mat-icon> Filters
+            </button>
+            <ul class="dropdown-menu p-2 shadow-sm" style="min-width: 150px;">
+                <li class="form-check">
+                    <input class="form-check-input" type="checkbox" id="filterAll" [(ngModel)]="filter.all"
+                        (change)="applyFilter('all')">
+                    <label class="form-check-label" for="filterAll">All</label>
+                </li>
+                <li class="form-check">
+                    <input class="form-check-input" type="checkbox" id="filterSent" [(ngModel)]="filter.sent"
+                        (change)="applyFilter('sent')">
+                    <label class="form-check-label" for="filterSent">Sent</label>
+                </li>
+                <li class="form-check">
+                    <input class="form-check-input" type="checkbox" id="filterNotSent" [(ngModel)]="filter.notSent"
+                        (change)="applyFilter('notSent')">
+                    <label class="form-check-label" for="filterNotSent">Not Sent</label>
+                </li>
+            </ul>
+        </div>          
+        <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <mat-icon class="align-middle">download</mat-icon> Download
+            </button>
+            <ul class="dropdown-menu p-2 shadow-sm">
+                <li><button class="dropdown-item" (click)="exportToExcel()">Excel</button></li>
+                <li><button class="dropdown-item" (click)="exportToCSV()">CSV</button></li>
+            </ul>
+        </div>          
+        <button class="btn btn-outline-primary" (click)="ngOnInit()">
+            <mat-icon class="align-middle">refresh</mat-icon>
+        </button>
+    </div>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th style="width: 10%;">S. No</th>
+            <th style="width: 25%;">Number</th>
+            <th style="width: 45%;">Message</th>
+            <th style="width: 20%;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let log of logs; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ log.number }}</td>
+            <td style="white-space: pre-line;" [title]="convertHtml(log.message)">
+                {{ getShortMessage(log.message) }}
+            </td>
+            <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(log.status)">
+                    {{ log.status }}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>  

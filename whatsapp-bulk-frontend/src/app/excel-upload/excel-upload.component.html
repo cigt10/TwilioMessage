@@ -1,0 +1,352 @@
+<!-- Add this inside <head> -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<div class="main-panel">
+
+    <!-- View: Upload Excel File -->
+    <div *ngIf="currentView === 'upload'">
+        <h4 class="heading">Select Spreadsheet</h4>
+
+        <div class="drop-area" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+            [class.drag-over]="dragging">
+
+            <i class="fa-solid fa-file-excel"></i>
+            <p>Drag an Excel Sheet file here or click the button below to upload.</p>
+
+            <input type="file" (change)="onFileSelected($event)" hidden #fileInput accept=".xlsx, .xls" />
+            <button mat-raised-button color="primary" (click)="fileInput.click()">Select File</button>
+
+            <div class="file-size-info">Maximum file size: 5 MB</div>
+            <div *ngIf="fileError" class="error-text">{{ fileError }}</div>
+        </div>
+
+        <div class="action-buttons">
+            <button mat-stroked-button color="accent">Back</button>
+        </div>
+    </div>
+
+    <!-- View: Select Sheet -->
+    
+    <div *ngIf="currentView === 'sheet'" class="container mt-1" style="max-width: 600px;">
+    
+        <!-- Heading -->
+        <div class="col-5">
+            <h6 class="mb-4 justify-content-between">Select Spreadsheet</h6>
+        </div>
+    
+        <!-- Uploaded File Box -->
+        <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-3"
+            style="background-color: #f8f9fa;">
+            <div class="d-flex align-items-center gap-2">
+                <mat-icon fontIcon="insert_drive_file" style="font-size: 24px; color:#4285f4;" color="primary"></mat-icon>
+                <span class="fw-normal">{{ fileName }}</span> <!-- File Name -->
+            </div>
+            <button class="btn btn-link text-dark p-0 fs-4" (click)="clearFile()">
+                <mat-icon>close</mat-icon> <!-- Clear Button -->
+            </button>
+        </div>
+    
+        <!-- Select Sheet -->
+        <div class="row align-items-center mb-1">
+            <div class="col-4">
+                <label class="mb-0">Select Sheet</label>
+            </div>
+            <div class="col-8">
+                <select class="form-select" [(ngModel)]="selectedSheet" (change)="onSheetSelect()" placeholder="Select Sheet">
+                    <option value="" disabled selected ></option>
+                    <option *ngFor="let sheet of sheetNames" [value]="sheet">{{ sheet }}</option>
+                </select>
+        
+                <!-- Error Message -->
+                <div *ngIf="showValidationError" class="text-danger small mt-1">
+                    Please select the sheet
+                </div>
+            </div>    
+        </div>
+    
+        <!-- Select Rows -->
+        <div class="row align-items-center mb-3 mt-4" *ngIf="selectedSheet">
+            <div class="col-4">
+                <label class="mb-0">Select Rows</label>
+            </div>
+            <div class="col-8 d-flex align-items-center gap-3">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="sendAll" value="all" [(ngModel)]="rowOption"
+                        (change)="onRowOptionChange()" name="rowOption">
+                    <label class="form-check-label" for="sendAll">Send to All</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="sendSelected" value="selected" [(ngModel)]="rowOption"
+                        (change)="onRowOptionChange()" name="rowOption">
+                    <label class="form-check-label" for="sendSelected">Send to Selected</label>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Row Number Inputs -->
+        <div class="row mb-0" *ngIf="selectedSheet">
+            <div class="mb-5 text-primary col-5" [ngStyle]="{ color: recipientCount === 0 ? 'red' : '#0d6efd' }">
+                {{ recipientCount }} Recipients selected
+            </div>
+            <!-- Start Row -->
+            <div class="col-3" *ngIf="rowOption === 'selected'">
+                <input type="number" class="form-control" [ngClass]="{ 'is-invalid': startRowError }" [(ngModel)]="startRow"
+                    placeholder="Start row number" (input)="validateRowRange()" />
+                <div *ngIf="startRowError" class="invalid-feedback">
+                    {{ startRowError }}
+                </div>
+            </div>
+            
+            <!-- End Row -->
+            <div class="col-3" *ngIf="rowOption === 'selected'">
+                <input type="number" class="form-control" [ngClass]="{ 'is-invalid': endRowError }" [(ngModel)]="endRow"
+                    placeholder="End row number" (input)="validateRowRange()" />
+                <div *ngIf="endRowError" class="invalid-feedback">
+                    {{ endRowError }}
+                </div>
+            </div>  
+        </div>
+        <!-- Action Buttons -->
+        <div class="button d-flex justify-content-between mt-4">
+            <button mat-stroked-button color="accent" (click)="currentView = 'upload'">Back</button>
+            <div class="text-end">
+                <button mat-stroked-button color="accent" (click)="validateAndProceed()">
+                    Next
+                </button>      
+            </div> 
+        </div>
+    </div>
+
+    <!-- View: Map Fields -->
+    <div *ngIf="currentView === 'mapFields'" class="container py-3">
+        <h5 class="fw-bold mb-4 col-3 me-4">Map Fields</h5>
+    
+        <!-- Country Code Row -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-4">
+                <label class="mb-0">Country Code</label>
+            </div>
+        
+            <div class="col-md-6">
+                <span *ngIf="countryCodeOption">
+                    <ng-container [ngSwitch]="countryCodeOption">
+                        <span *ngSwitchCase="'without'">Add {{ selectedCountryCodeColumn }} to number</span>
+                        <span *ngSwitchCase="'with'">Number contains country code</span>
+                        <span *ngSwitchCase="'column'">{{ selectedCountryCodeColumn }}</span>
+                    </ng-container>
+                </span>                  
+            </div>
+        
+            <div class="col-md-2 text-end">
+                <a href="javascript:void(0)" (click)="openCountryCodeDialog()" class="text-primary fw-semibold">
+                    CHANGE
+                </a>                  
+            </div>
+        </div>          
+    
+        <!-- Phone Number Dropdown -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-4">
+                <label class="mb-0">Phone number</label>
+            </div>
+        
+            <div class="col-md-8 position-relative">
+                <select class="form-select pe-5 custom-select-clear" [(ngModel)]="selectedPhoneField" (change)="onPhoneNumberSelect()">
+                    <option [ngValue]="null" disabled hidden>Select column</option>
+                    <option *ngFor="let column of excelColumns" [ngValue]="column">{{ column }}</option>
+                </select>
+        
+                <!-- Show Clear (X) if selected -->
+                <button *ngIf="selectedPhoneField" type="button" class="btn p-0 position-absolute top-50 translate-middle-y me-4"
+                    style="right: 0.75rem;" (click)="clearPhoneSelection()">
+                    <mat-icon style="font-size: 18px; color: #666;">close</mat-icon>
+                </button>
+        
+                <!-- Show Arrow only when no value is selected -->
+                <span *ngIf="!selectedPhoneField" class="position-absolute top-50 translate-middle-y me-4"
+                    style="right: 0.75rem; pointer-events: none;">
+                    ▼
+                </span>
+                <!-- Error message -->
+                <div *ngIf="showPhoneValidationError" class="text-danger small mt-1">
+                    Please select a phone number column
+                    </div>
+            </div>
+        </div>          
+    
+        <!-- Message -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-4">
+                <label class="mb-0">Message   <span style="color: transparent;">&63a</span> </label>
+            </div>
+            <div class="col-md-8">
+                <button class="btn btn-outline-primary w-100 mt-2" (click)="goToTemplateMessage()">
+                    {{ getTemplateName() }}
+                    <span *ngIf="selectedTemplateName" (click)="clearTemplateName($event)"
+                        style="cursor:pointer; color:red; font-size: 18px;"> X </span>
+                </button>
+                <div *ngIf="showTemplateValidationError" class="text-danger small mt-1">
+                    Please select a message template </div>
+            </div>
+        </div>
+    
+        <!-- Attachment Section -->
+        <div class="form-group mt-4">        
+            <div class="d-flex gap-4 flex-wrap align-items-center">
+                <label class="form-label fw-semibold mb-3">Attach media</label>
+                <!-- IMAGE -->
+                <div class="text-center cursor-pointer" (click)="triggerFileSelect('image')">
+                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-1"
+                        style="width:50px; height:50px;">
+                        <span class="material-icons">photo_camera</span>
+                    </div>
+                    <div class="mt-1 text-secondary">Image</div>
+                    <input type="file" accept="image/*" #imageInput hidden (change)="handleMediaFile($event, 'Image')" />
+                </div>
+        
+                <!-- VIDEO -->
+                <div class="text-center cursor-pointer" (click)="triggerFileSelect('video')">
+                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-1"
+                        style="width:50px; height:50px;">
+                        <span class="material-icons">videocam</span>
+                    </div>
+                    <div class="mt-1 text-secondary">Video</div>
+                    <input type="file" accept="video/*" #videoInput hidden (change)="handleMediaFile($event, 'Video')" />
+                </div>
+        
+                <!-- DOCUMENT -->
+                <div class="text-center cursor-pointer" (click)="triggerFileSelect('document')">
+                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-1"
+                        style="width:50px; height:50px;">
+                        <span class="material-icons">insert_drive_file</span>
+                    </div>
+                    <div class="mt-1 text-secondary">Document</div>
+                    <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" #docInput hidden
+                        (change)="handleMediaFile($event, 'Document')" />
+                </div>
+        
+                <!-- POLL (disabled) -->
+                <div class="text-center opacity-50">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-1"
+                        style="width:50px; height:50px;">
+                        <span class="material-icons text-muted">poll</span>
+                    </div>
+                    <div class="mt-1 text-muted">Poll</div>
+                </div>
+            </div>
+        
+            <!-- Preview Uploaded Files -->
+            <div class="mt-3" *ngFor="let fileItem of selectedFiles; let i = index">
+                <div class="d-flex justify-content-between align-items-center border p-2 rounded">
+                    <div>
+                        <span class="material-icons me-2">
+                            {{
+                            fileItem.type === 'Image' ? 'photo_camera' :
+                            fileItem.type === 'Video' ? 'videocam' :
+                            'insert_drive_file'
+                            }}
+                        </span>
+                        <span>{{ fileItem.file.name }}</span>
+                        <span class="text-muted small">({{ (fileItem.file.size / 1024 / 1024).toFixed(2) }} MB)</span>
+                        <div class="text-danger small" *ngIf="fileItem.error">{{ fileItem.error }}</div>
+                    </div>
+                    <span class="text-danger cursor-pointer" (click)="removeFile(i)">×</span>
+                </div>
+            </div>
+        </div>          
+    
+        <!-- Navigation Buttons -->
+        <div class="button d-flex justify-content-between mt-4">
+            <button  mat-stroked-button color="accent" (click)="currentView = 'sheet'">Back</button>
+            <button mat-stroked-button color="accent" (click)="validateBeforePreview()">
+                Next   
+            </button>        
+        </div>
+    </div>    
+
+
+    <div *ngIf="currentView === 'preview'" class="preview-container">
+    
+        <h5 class="fw-bold mb-3 col-8">WhatsApp Message Preview</h5>
+    
+        <!-- Template Name -->
+        <div class="mb-3 template-info row-4 col-8" >
+            <span class="fw-semibold " >Template Name:-</span>
+            <span class="text-muted ms-1 ">{{ getTemplateName() || 'No template used' }}</span>
+        </div>
+    
+        <!-- WhatsApp Styled Card with Arrows -->
+        <div class="whatsapp-preview-wrapper">
+    
+            <!-- Left Arrow -->
+            <button class="circle-arrow left" (click)="prev()" [disabled]="currentIndex === 0">
+                <span class="material-icons">arrow_back</span>
+            </button>
+    
+            <!-- Card -->
+            <div class="whatsapp-card" >
+                <div class="whatsapp-card-header">
+                    <span class="phone-badge">To: {{ getSelectedPhoneNumber() }}</span>    
+                </div>
+    
+                <div class="message-content">
+                    <div class="message-box">
+                        {{ convertHtml(getSelectedMessage()) }}
+                        <br /><br />
+                        <strong class="powered-text">Powered by cigtwa.com</strong>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Right Arrow -->
+            <button class="circle-arrow right" (click)="next()" [disabled]="currentIndex >= excelData.length - 1">
+                <span class="material-icons">arrow_forward</span>
+            </button>
+        </div>
+    
+        <!-- Bottom Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <button mat-stroked-button color="accent" (click)="currentView = 'mapFields'">Back</button>
+            <button mat-stroked-button color="accent" (click)="sendMessagesFromExcel()">Send Messages</button>
+        </div>
+    
+    </div>             
+
+
+    <div *ngIf="currentView === 'processing'" class="text-center mt-5">
+        <div class="spinner-circle mx-auto mb-3">
+            <span *ngIf="!isPaused" class="spinner-border text-primary" style="width: 64px; height: 64px;"></span>
+            <span *ngIf="isPaused" class="material-icons text-primary" style="font-size: 64px;">pause</span>
+        </div>
+
+        <h4>{{ sentCount + notSentCount }} / {{ totalCount }} records processed</h4>
+        <p>
+            <span class="text-success">{{ sentCount }} : Sent</span> |
+            <span class="text-danger">{{ notSentCount }} : Not Sent</span>
+        </p>
+
+        <div class="d-flex justify-content-center mt-4">
+            <button class="btn btn-outline-danger me-2" (click)="cancelProcess()">Cancel</button>
+
+            <!-- Pause/Resume Button -->
+            <button *ngIf="!isPaused" class="btn btn-primary" (click)="pauseProcess()">Pause</button>
+            <button *ngIf="isPaused" class="btn btn-primary" (click)="resumeProcess()">Resume</button>
+        </div>
+    </div>
+
+    <!-- Final Result View -->
+    <div *ngIf="currentView === 'result'" class="text-center mt-5">
+        <span class="material-icons text-success" style="font-size: 64px;">check_circle</span>
+        <h4>{{ result.deliverMsgCount + result.unDeliverMsgCount }} / {{ result.deliverMsgCount }} records processed
+        </h4>
+        <p>
+            <span class="text-success">{{ result.deliverMsgCount }} : Sent</span> |
+            <span class="text-danger">{{ result.unDeliverMsgCount }} : Not Sent</span>
+        </p>
+        <div class="d-flex justify-content-center mt-4">
+            <button class="btn btn-primary me-2" (click)="openReport()">View Report</button>
+            <button class="btn btn-outline-primary" (click)="goHome()">Home</button>
+        </div>
+    </div>
+</div>
+    

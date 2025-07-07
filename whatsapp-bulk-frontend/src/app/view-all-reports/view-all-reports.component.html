@@ -1,0 +1,40 @@
+<div class="report-container">
+    <h2 class="report-title"> Delivery Report</h2>
+    <div class="left-align">
+        <button (click)="exportToExcel()" class="btn btn-success">
+             Export to Excel
+        </button>
+    </div>
+      
+    <table *ngIf="logs.length; else empty" class="report-table">
+        <thead>
+            <tr>
+                <th>Msg ID</th>
+                <th>Phone Number</th>
+                <th>Status</th>
+                <th>Message</th>
+                <th>Sent At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let l of logs">
+                <td>{{ l.msgId }}</td>
+                <td>{{ l.phoneNumber }}</td>
+                <td>
+                    <span class="status-badge" [ngClass]="{
+                'sent': l.status === 'sent',
+                'failed': l.status === 'Failed'
+              }">{{ l.status }}</span>
+                </td>
+                <td>{{ l.message }}</td>
+                <td>{{ l.sentAt | date:'short' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ng-template #empty>
+        <div class="empty-message">⚠️ No report data yet.</div>
+    </ng-template>
+</div>
+
+<!-- <div> test  </div> --> 

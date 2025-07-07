@@ -1,0 +1,10 @@
+mat-dialog-content p {
+    margin: 0;
+    font-size: 15px;
+}
+.no-btn {
+    margin-right: 8px;
+    border-color: red !important;
+    color: red !important;
+    background-color: rgb(244, 198, 197) !important;
+}

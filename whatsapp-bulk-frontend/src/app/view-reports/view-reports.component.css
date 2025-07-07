@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+.report-container {
+    font-family: 'Inter', sans-serif;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 16px;
+}
+
+.table {
+    font-size: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    border: none;
+    text-align: left;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.table tbody td {
+    padding: 12px;
+    color: #444;
+    border-top: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.text-muted {
+    color: #aaa !important;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 12px;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.status-completed {
+    background-color: #d4f5e6;
+    color: #2e7d32;
+}
+
+.status-canceled {
+    background-color: #fff1cc;
+    color: #ad6800;
+}
+
+.status-partial {
+    background-color: #fcefd3;
+    color: #c77800;
+}
+
+.empty-message {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+    padding: 24px 0;
+}
+
+.refresh-btn {
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    box-shadow: none;
+}

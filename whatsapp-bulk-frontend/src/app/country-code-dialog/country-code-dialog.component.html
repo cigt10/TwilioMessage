@@ -1,0 +1,51 @@
+<div class="country-code-dialog mat-dialog-container">
+
+  <!-- Custom Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">Country Code Settings</h2>
+    <button mat-icon-button class="close-button" (click)="closeDialog()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+  
+    <!-- Country Code Option Dropdown -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Country Code Option</mat-label>
+      <mat-select [(ngModel)]="countryCodeOption" (selectionChange)="onOptionChange( )">
+        <mat-option value="without">Number without country code</mat-option>
+        <mat-option value="with">Number contains country code</mat-option>
+        <mat-option value="column">Select country code from column in data</mat-option>
+      </mat-select>
+    </mat-form-field>
+  
+    <!-- Add Country Code (if 'without') -->
+    <mat-form-field *ngIf="countryCodeOption === 'without'" appearance="outline" class="full-width">
+      <mat-label>Add Country Code</mat-label>
+      <mat-select [(ngModel)]="selectedCode" (selectionChange)="onCodeChange()">
+        <mat-option *ngFor="let code of countryCodes" [value]="code.value">
+          {{ code.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  
+    <!-- Select Column (if 'column') -->
+    <mat-form-field *ngIf="countryCodeOption === 'column'" appearance="outline" class="full-width">
+      <mat-label>Choose country code</mat-label>
+      <mat-select [(ngModel)]="selectedColumn" (selectionChange)="onColumnChange()">
+        <mat-option *ngFor="let column of data.excelColumns" [value]="column">{{ column }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  
+  </mat-dialog-content>  
+
+  <!-- Footer Buttons -->
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button color="primary" (click)="save()" [disabled]="isSaved">
+      {{ isSaved ? 'Saved' : 'Save' }}
+    </button>
+    <button mat-flat-button color="primary" [disabled]="!canSubmit()" (click)="done()">Done</button>
+  </mat-dialog-actions>
+
+</div>

@@ -12,6 +12,7 @@ import { QuillModule } from 'ngx-quill';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MessageService } from '../shared/message.service';
 import { Router } from '@angular/router';
+import { HtmlUtilsService } from '../Utils/helper';
 
 
 @Component({
@@ -35,11 +36,12 @@ export class TemplateMessageComponent implements OnInit {
   selectedTemplate: string | null = null;
   selectedTemplateName: string = '';
   templateName: string = '';
+  showEditorError: boolean = false;
 
   excelColumns: string[] = [];
 
   constructor(private templateService: TemplateService,   private messageService: MessageService,
-    public dialogRef: MatDialogRef<TemplateMessageComponent>, private router: Router,
+    public dialogRef: MatDialogRef<TemplateMessageComponent>, private router: Router,private htmlUtils: HtmlUtilsService, 
     @Inject(MAT_DIALOG_DATA) public data: { message: string, excelColumns: string[] ,templateName: string}
   ) {
     this.message = data.message || '';
@@ -51,16 +53,21 @@ export class TemplateMessageComponent implements OnInit {
     this.selectedTemplate = template.name; // store actual name
   }  
   onDone() {
-    // this.messageService.setMessage(this.message);
-    // this.messageService.setTemplateName(this.selectedTemplateName || 'Template  Message');
-    // this.router.navigate(['']);
+    const plainText = this.htmlUtils.stripHtml(this.message || '');
+  
+    if (!plainText.trim()) {
+      this.showEditorError = true;
+      return;
+    }
+  
+    this.showEditorError = false;
+  
     this.dialogRef.close({
       message: this.message,
       templateName: this.selectedTemplateName || 'Whatsapp Message'
-      // templateName: this.templateName || 'Whatsapp Message'
-
     });
   }
+  
   
   ngOnInit(): void {
     this.loadTemplates();

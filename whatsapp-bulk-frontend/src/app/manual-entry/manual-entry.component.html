@@ -111,12 +111,15 @@
             {{ getTemplateName() }}
             <span *ngIf="selectedTemplateName" class="clear-inside" (click)="clearTemplateName($event)">×</span>
         </button>
-    </div>      
+    </div> 
+    <div *ngIf="showTemplateValidationError" class="text-danger small mt-1">
+        Please select a message template </div>
+    </div>
     <div class="button-group">
         <button class="btn btn-primary send-btn" (click)="goHome()">Back</button>
-        <button class="btn btn-primary send-btn" (click)="sendMessages()">Send</button>
+        <button class="btn btn-primary send-btn" (click)="validateBeforePreview()">Send</button>
     </div>
-</div>
+
 <div *ngIf="step === 'processing'" class="text-center mt-5">
     <div class="spinner-circle mx-auto mb-3">
         <span *ngIf="!isPaused" class="spinner-border text-primary" style="width: 64px; height: 64px;"></span>

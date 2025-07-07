@@ -23,6 +23,7 @@ import { ManualEntryComponent } from '../manual-entry/manual-entry.component';
 import { MenuSidebarComponent } from '../menu-sidebar/menu-sidebar.component';
 import { GoogleSheetComponent } from '../google-sheet/google-sheet.component';
 import * as XLSX from 'xlsx';
+import { WhatsAppMsgResponse } from '../models/whats-app-msg-response';
 
 @Component({
   selector: 'app-send-bulk',
@@ -39,9 +40,9 @@ export class SendBulkComponent {
   message = '';
   result: WhatsAppMsgResponse | null = null; // correct type here
 
-  activePanel: string = 'paste';
   currentStatus = 'active';
   showAttachments = false;
+  selectedPanel: string = 'paste';
   
   constructor(private service: WhatsAppService) {}
 
@@ -89,6 +90,7 @@ export class SendBulkComponent {
       console.error('Please upload a single file only.');
       return;
     }
+    
 
     const reader: FileReader = new FileReader();
 
@@ -110,12 +112,10 @@ export class SendBulkComponent {
 
     reader.readAsBinaryString(target.files[0]);
   }
+  onPanelChange(panel: string) {
+    this.selectedPanel = panel;
+  }
 }
-interface WhatsAppMsgResponse {
-  message: string;
-  deliverMsgCount: number;
-  unDeliverMsgCount: number;
-} 
 
 
 // import { Component } from '@angular/core';

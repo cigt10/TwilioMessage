@@ -37,8 +37,11 @@
     <!-- Message Editor -->
     <div class="editor-container">
         <quill-editor [(ngModel)]="message" [modules]="editorModules" [styles]="{ height: '200px' }" theme="snow"
-            placeholder="Type here...">
+            placeholder="Type here..." [ngClass]="{  'is-invalid': showEditorError }">
         </quill-editor>
+
+        <!-- Error Message -->
+         <div *ngIf="showEditorError" class="text-danger mt-1">Message is required.</div>
 
         <!-- + Variables -->
         <div class="toolbar-footer">

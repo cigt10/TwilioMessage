@@ -39,5 +39,16 @@ export class HtmlUtilsService {
           : plain;
   } 
   
+  stripHtml(html: string): string {
+    const div = document.createElement('div')
+    div.innerHTML = html
+    return div.textContent || div.innerText || ''
+  }
+
+  breakMessageIntoLines(message: string): string {
+    if (!message) return '';
+    const chunkSize = 10 ;
+    return message.match(new RegExp(`.{1,${chunkSize}}`, 'g'))?.join('\n') || message;
+  }  
 
 }

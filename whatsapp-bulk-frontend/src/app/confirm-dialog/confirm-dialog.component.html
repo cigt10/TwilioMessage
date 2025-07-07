@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <p style="margin-bottom: 8px;">Looks like your phone numbers already contain the country code.</p>
+    <p>You must change the country code setting from <strong>"Default"</strong> to <strong>"Number contains country
+            code"</strong>?</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button class="no-btn" mat-stroked-button color="warn" (click)="onNo()">NO</button>
+    <button mat-flat-button color="primary" (click)="onYes()">YES</button>
+</mat-dialog-actions>

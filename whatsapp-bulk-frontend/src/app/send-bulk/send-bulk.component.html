@@ -97,10 +97,11 @@
     </div>
     <div class="sheetwa-wrapper">
       
-      <app-menu-sidebar [activePanel]="activePanel" (panelSelected)="activePanel = $event">
+      <app-menu-sidebar [activePanel]="selectedPanel" (panelSelected)="onPanelChange($event)">
       </app-menu-sidebar>
+
     
-      <div [ngSwitch]="activePanel">
+      <div [ngSwitch]="selectedPanel">
         <div *ngSwitchCase="'paste'"><app-manual-entry></app-manual-entry></div>
         <div *ngSwitchCase="'excel'"><app-excel-upload></app-excel-upload></div>
         <div *ngSwitchCase="'google'"><app-google-sheet></app-google-sheet></div>

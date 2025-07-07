@@ -45,10 +45,4 @@ export class HtmlUtilsService {
     return div.textContent || div.innerText || ''
   }
 
-  breakMessageIntoLines(message: string): string {
-    if (!message) return '';
-    const chunkSize = 10 ;
-    return message.match(new RegExp(`.{1,${chunkSize}}`, 'g'))?.join('\n') || message;
-  }  
-
 }

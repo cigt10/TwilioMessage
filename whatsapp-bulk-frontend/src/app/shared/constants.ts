@@ -5,7 +5,7 @@ export const APP_CONSTANTS = {
 
 export const COUNTRY_CODES = [
     { label: 'India (+91)', value: '+91' },
-    { label: 'USA (+1)', value: '+1' },
+    { label: 'US (+1)', value: '+1' },
     { label: 'UK (+44)', value: '+44' },
 ];  
 

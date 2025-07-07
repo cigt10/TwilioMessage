@@ -81,7 +81,7 @@
 // }
 
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { FormsModule } from '@angular/forms';
@@ -95,7 +95,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ViewChild, ElementRef } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 import { CountryCodeDialogComponent } from '../country-code-dialog/country-code-dialog.component';
@@ -105,7 +104,6 @@ import { WhatsAppService } from '../whatsapp.service';
 import { WhatsAppMsgResponse } from '../models/whats-app-msg-response';
 import { FilePreview } from '../models/file-preview';
 import { HtmlUtilsService } from '../Utils/helper';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 
 
@@ -121,18 +119,17 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     MatInputModule,
     MatSelectModule,
     MatRadioModule,
-    MatIconModule,
-    
+    MatIconModule
   ],
   templateUrl: './excel-upload.component.html',
   styleUrls: ['./excel-upload.component.css']
 })
-export class ExcelUploadComponent implements OnInit {
+export class ExcelUploadComponent {
   [x: string]: any;
-  constructor(private dialog: MatDialog, private router: Router,private service: WhatsAppService, private htmlUtils: HtmlUtilsService, private snackBar: MatSnackBar) {}
+  constructor(private dialog: MatDialog, private router: Router,private service: WhatsAppService, private htmlUtils: HtmlUtilsService) {}
 
   // View state
-  currentView: 'upload' | 'sheet' | 'mapFields' | 'preview' | 'processing' | 'result' = 'upload';
+  currentView: string = 'upload';
   currentIndex: number = 0;
 
   // File handling
@@ -156,7 +153,7 @@ export class ExcelUploadComponent implements OnInit {
 
   // Country code
   countryCodeOption: 'without' | 'with' | 'column' = 'without';
-  selectedCountryCodeColumn = '';
+  selectedCountryCodeColumn: string = '';
   selectedCountryCodeLabel: string = '';
   
   // Row range selection
@@ -165,8 +162,6 @@ export class ExcelUploadComponent implements OnInit {
   endRow = 2;
   recipientCount = 0;
   plainText: string = '';
-  startRowError: string | null = null;
-  endRowError: string | null = null;
   //attachment
   whatsAppRequest: WhatsAppRequest = {
     encodedPhoneNumbers: '',
@@ -176,11 +171,8 @@ export class ExcelUploadComponent implements OnInit {
   showAttachments = false;
   selectedFiles: FilePreview[] = [];
   errorMessage: string = '';
-  showValidationError = false;
-  showPhoneValidationError: boolean = false;
-  showTemplateValidationError: boolean = false;
-  isPreview : boolean = false;
 
+  
   // send message
   processing = false;
   completed = false;
@@ -262,9 +254,6 @@ export class ExcelUploadComponent implements OnInit {
   }
 
   onSheetSelect() {
-    if (this.selectedSheet) {
-      this.showValidationError = false;
-    }
     if (!this.workbook || !this.selectedSheet) return;
 
     const worksheet = this.workbook.Sheets[this.selectedSheet];
@@ -279,11 +268,6 @@ export class ExcelUploadComponent implements OnInit {
     this.updateRecipientCount();
   }
 
-  onPhoneNumberSelect() {
-    if (this.selectedPhoneField) {
-      this.showPhoneValidationError = false;
-    }
-  }
   clearFile() {
     this.fileName = '';
     this.sheetNames = [];
@@ -300,10 +284,8 @@ export class ExcelUploadComponent implements OnInit {
   // Message Selection
   // ================================
   goToTemplateMessage() {
-    this.showTemplateValidationError = false;
     const dialogRef = this.dialog.open(TemplateMessageComponent, {
       width: '500px',
-      disableClose: true, // ❗ prevents closing on backdrop click or ESC
       data: {
         message: this.customMessage,
         excelColumns: this.excelColumns
@@ -337,8 +319,6 @@ export class ExcelUploadComponent implements OnInit {
 
   clearPhoneSelection() {
     this.selectedPhoneField = '';
-    this.showPhoneValidationError = true;
-
   }
 
   // ================================
@@ -347,45 +327,22 @@ export class ExcelUploadComponent implements OnInit {
   openCountryCodeDialog() {
     const dialogRef = this.dialog.open(CountryCodeDialogComponent, {
       width: '500px',
-      disableClose: true, // ❗ prevents closing on backdrop click or ESC
-      data: {
-        excelColumns: this.excelColumns,
-        currentOption: this.countryCodeOption,
-        selectedCode: this.selectedCountryCodeColumn
-      }
+      data: { excelColumns: this.excelColumns }
     });
   
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
   
-      this.countryCodeOption = result.option;
+      this.countryCodeOption = result.option; // 'without', 'with', 'column'
   
       if (result.option === 'without') {
         this.selectedCountryCodeColumn = result.selectedCode;
       } else if (result.option === 'with') {
-        this.selectedCountryCodeColumn = '';
+        this.selectedCountryCodeColumn = ''; // Already included
       } else if (result.option === 'column') {
         this.selectedCountryCodeColumn = result.selectedColumn;
       }
-  
-      // No need for countryCodeSaved flag unless UI shows "Saved"
     });
-  }
-  
-  ngOnInit() {
-    const saved = localStorage.getItem('defaultCountryCodeSettings');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      this.countryCodeOption = parsed.option || 'with';
-  
-      if (parsed.option === 'without') {
-        this.selectedCountryCodeColumn = parsed.selectedCode;
-      } else if (parsed.option === 'column') {
-        this.selectedCountryCodeColumn = parsed.selectedColumn;
-      } else {
-        this.selectedCountryCodeColumn = '';
-      }
-    }
   }
   
 
@@ -518,63 +475,21 @@ export class ExcelUploadComponent implements OnInit {
     this.selectedFiles.splice(index, 1);
   }
 
-  getSelectedPhoneNumber(): any {
+  getSelectedPhoneNumber(): string {
     const row = this.excelData[this.currentIndex];
     const number = row?.[this.selectedPhoneField] || '';
-    var phoneNumber: any = null;
-
-    // alert(this.countryCodeOption)
-    if (!number) return '';
   
-    if (this.countryCodeOption === 'with') { 
-      phoneNumber = number;
+    if (this.countryCodeOption === 'with') {
+      return number; // already contains code
     }
-    if (this.countryCodeOption === 'without') { 
-      phoneNumber = `${this.selectedCountryCodeColumn}${number}`;    }
+  
     if (this.countryCodeOption === 'column') {
-      // alert(this.selectedCountryCodeColumn)
-      if (this.selectedCountryCodeColumn === 'CountryCode') {
-        const code = row?.[this.selectedCountryCodeColumn] || '';
-        phoneNumber = `${code}${number}`;
-        // alert("column2")
-      } 
-      else if (this.selectedCountryCodeColumn === 'PhoneNumber')
-      {
-        // alert("column3")
-        if (this.getExcelData(this.selectedCountryCodeColumn)) {
-          // alert("Phone  " + this.selectedCountryCodeColumn)
-          const pnumber = row?.[this.selectedCountryCodeColumn] || '';
-          phoneNumber = pnumber;
-          this.isPreview = true;
-        }
-        else {
-          // alert("Phone Number does not contain country code, Please select another column");
-          return;
-        }
-      }
-      else
-      { 
-        // alert("column4")      
-      }
-      
+      const code = row?.[this.selectedCountryCodeColumn] || '';
+      return `${code}${number}`;
     }
   
-    // 'without' case: selectedCountryCodeColumn stores code like +91
-    return phoneNumber;
-  }
-  getExcelData(selectedPhoneField: string): boolean { 
-    var isValid = true;
-    const numbersWithoutCode = this.excelData.filter(row => {
-      const phone = row[selectedPhoneField];
-      if(!this.hasCountryCode(phone)){
-      isValid = false;
-      }
-    });
-    return isValid;
-  }
-
-  hasCountryCode(phone: string): boolean {
-    return typeof phone === 'string' && /^\+\d{1,4}/.test(phone.trim());
+    const code = this.selectedCountryCodeLabel.match(/\+\d+/)?.[0] || '';
+    return `${code}${number}`;
   }
   
   getSelectedCountryCodeOnly(): string {
@@ -593,8 +508,8 @@ export class ExcelUploadComponent implements OnInit {
   }
 
   const fullNumbers: string[] = [];
-  const customerNames: string[] = [];
-  // alert("Next") 
+    const customerNames: string[] = [];
+    
   const fromRow = this.rowOption === 'all' ? 0 : Math.max(0, this.startRow - 2);
   const toRow = this.rowOption === 'all' ? this.excelData.length : Math.min(this.endRow - 1, this.excelData.length - 1);
 
@@ -606,7 +521,7 @@ export class ExcelUploadComponent implements OnInit {
     if (number) {
       fullNumbers.push(number);
     }
-    const name = this.getNameFromRow(row);
+     const name = this.getNameFromRow(row);
     if (name) {
       customerNames.push(name);
     }
@@ -630,7 +545,7 @@ export class ExcelUploadComponent implements OnInit {
 
   this.processing = true;
   this.step = 'processing';
-  this.currentView='processing';
+  this.currentView='';
   this.sentCount = 0;
   this.notSentCount = 0;
   this.totalCount = fullNumbers.length;
@@ -640,7 +555,6 @@ export class ExcelUploadComponent implements OnInit {
     this.processing = false;
     this.completed = true;
     this.step = 'result';
-    this.currentView='result';
     this.sentCount = res.deliverMsgCount;
     this.notSentCount = res.unDeliverMsgCount;
     this.errorMessage = res.errorMessage;
@@ -662,8 +576,7 @@ getPhoneNumberFromRow(row: any): string {
 
   const code = this.getSelectedCountryCodeOnly();
   return code + number;
-  }
-  
+}
 getNameFromRow(row: any): string {
   const name = row?.["Name"]?.toString().trim() || '';
   return name;
@@ -703,121 +616,9 @@ openReport() {
   const url = this.router.serializeUrl(this.router.createUrlTree(['/report']));
   window.open(url, '_blank');
   }  
-clearTemplateName(event: Event) {
+  clearTemplateName(event: Event) {
     event.stopPropagation();
     this.selectedTemplateName = '';
-  this.customMessage = ''; 
-  this.showTemplateValidationError = true; 
+    this.customMessage = ''; // optionally clear the message too
   }
-  breakMessages(htmlContent: string) {
-    return this.htmlUtils.breakMessageIntoLines(htmlContent);
-  } 
-  // validate 
-
-  validateAndProceed() {
-    if (!this.selectedSheet) {
-      this.showValidationError = true;
-    } else {
-      this.showValidationError = false;
-      this.currentView = 'mapFields';
-    }
-  }
-
-    validateBeforePreview() {
-    let isValid = true;
-  
-    // Validate phone field
-    if (!this.selectedPhoneField) {
-      this.showPhoneValidationError = true;
-      isValid = false;
-    } else {
-      this.showPhoneValidationError = false;
-    }
-  
-    // Validate template
-    const hasTemplate = this.getTemplateName().trim() !== 'No template used';
-    if (!hasTemplate) {
-      this.showTemplateValidationError = true;
-      isValid = false;
-    } else {
-      this.showTemplateValidationError = false;
-    }
-  
-    if (isValid) {
-      this.onNextClick(); // Only navigate if both fields are valid
-    }
-  }
-
-  validateRowRange() {
-    this.startRowError = null;
-    this.endRowError = null;
-  
-    if (!this.startRow || this.startRow <= 1) {
-      this.startRowError = 'Must be greater than 1';
-    }
-  
-    if (!this.endRow || this.endRow <= 1) {
-      this.endRowError = 'Must be greater than 1';
-    }
-  
-    if (this.startRow && this.endRow) {
-      if (this.startRow > this.endRow) {
-        this.startRowError = 'Must be smaller than end row';
-        this.endRowError = 'Must be greater than start row';
-      }
-    }
-  }
-  onNextClick() {
-    const phoneField = this.selectedPhoneField || this.excelColumns[0];
-    const codeField = this.selectedCountryCodeColumn || '';
-    const shouldCheckForCodeInPhone = ['without', 'column'].includes(this.countryCodeOption);
-
-    // For 'without' option: check if some phone numbers already have country code
-    if (shouldCheckForCodeInPhone && this.excelData?.length) {
-      const alreadyWithCode = this.excelData.some(row => {
-        const phone = row?.[phoneField];
-        return typeof phone === 'string' && /^\+\d{1,4}/.test(phone.trim());
-      });
-  
-      if (alreadyWithCode) {
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-          width: '550px',
-          disableClose: true,
-          data: {
-            title: 'Country Code Conflict',
-            message: 'Some phone numbers already contain a country code. Add again or switch to "Number contains country code"?',
-            confirmText: 'Yes, switch to "with"',
-            cancelText: 'No, add again'
-          }
-        });
-  
-        dialogRef.afterClosed().subscribe(choice => {
-          if (choice === 'yes') {
-            this.countryCodeOption = 'with';
-            this.selectedCountryCodeColumn = '';
-            this.goToPreview();
-          }
-        });
-  
-        return; // wait for user choice before continuing
-      }
-    }
-  
-    // ✅ Additional validation for 'column' option
-    if (this.countryCodeOption === 'column' && this.excelData?.length) {
-      const missingData = this.excelData.some(row => {
-        const code = row?.[codeField];
-        const phone = row?.[phoneField];
-        return !code && !phone;
-      });
-  
-      if (missingData) {
-        alert('Some rows are missing both phone number and country code. Please check your data.');
-        return;
-      }
-    }
-  
-    this.goToPreview(); // ✅ If everything okay
-  }  
-  
 }

@@ -10,7 +10,7 @@
         <div class="drop-area" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
             [class.drag-over]="dragging">
 
-            <i class="fa-solid fa-file-excel"></i>
+            <img src="assets/excel-icon.png" class="icon" />
             <p>Drag an Excel Sheet file here or click the button below to upload.</p>
 
             <input type="file" (change)="onFileSelected($event)" hidden #fileInput accept=".xlsx, .xls" />
@@ -38,7 +38,7 @@
         <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-3"
             style="background-color: #f8f9fa;">
             <div class="d-flex align-items-center gap-2">
-                <mat-icon fontIcon="insert_drive_file" style="font-size: 24px; color:#4285f4;" color="primary"></mat-icon>
+                <mat-icon fontIcon="insert_drive_file" style="font-size: 24px;" color="primary"></mat-icon>
                 <span class="fw-normal">{{ fileName }}</span> <!-- File Name -->
             </div>
             <button class="btn btn-link text-dark p-0 fs-4" (click)="clearFile()">
@@ -47,25 +47,19 @@
         </div>
     
         <!-- Select Sheet -->
-        <div class="row align-items-center mb-1">
+        <div class="row align-items-center mb-3">
             <div class="col-4">
                 <label class="mb-0">Select Sheet</label>
             </div>
             <div class="col-8">
-                <select class="form-select" [(ngModel)]="selectedSheet" (change)="onSheetSelect()" placeholder="Select Sheet">
-                    <option value="" disabled selected ></option>
+                <select class="form-select" [(ngModel)]="selectedSheet" (change)="onSheetSelect()">
                     <option *ngFor="let sheet of sheetNames" [value]="sheet">{{ sheet }}</option>
                 </select>
-        
-                <!-- Error Message -->
-                <div *ngIf="showValidationError" class="text-danger small mt-1">
-                    Please select the sheet
-                </div>
-            </div>    
+            </div>
         </div>
     
         <!-- Select Rows -->
-        <div class="row align-items-center mb-3 mt-4" *ngIf="selectedSheet">
+        <div class="row align-items-center mb-3" *ngIf="selectedSheet">
             <div class="col-4">
                 <label class="mb-0">Select Rows</label>
             </div>
@@ -88,61 +82,49 @@
             <div class="mb-5 text-primary col-5" [ngStyle]="{ color: recipientCount === 0 ? 'red' : '#0d6efd' }">
                 {{ recipientCount }} Recipients selected
             </div>
-            <!-- Start Row -->
             <div class="col-3" *ngIf="rowOption === 'selected'">
-                <input type="number" class="form-control" [ngClass]="{ 'is-invalid': startRowError }" [(ngModel)]="startRow"
-                    placeholder="Start row number" (input)="validateRowRange()" />
-                <div *ngIf="startRowError" class="invalid-feedback">
-                    {{ startRowError }}
-                </div>
+                <input type="number" class="form-control" [(ngModel)]="startRow" placeholder="Start row number"
+                    (input)="updateRecipientCount()" />
             </div>
-            
-            <!-- End Row -->
             <div class="col-3" *ngIf="rowOption === 'selected'">
-                <input type="number" class="form-control" [ngClass]="{ 'is-invalid': endRowError }" [(ngModel)]="endRow"
-                    placeholder="End row number" (input)="validateRowRange()" />
-                <div *ngIf="endRowError" class="invalid-feedback">
-                    {{ endRowError }}
-                </div>
-            </div>  
+                <input type="number" class="form-control" [(ngModel)]="endRow" placeholder="End row number"
+                    (input)="updateRecipientCount()" />
+            </div>
         </div>
         <!-- Action Buttons -->
-        <div class="button d-flex justify-content-between mt-4">
+        <div class="button d-flex justify-content-between">
             <button mat-stroked-button color="accent" (click)="currentView = 'upload'">Back</button>
-            <div class="text-end">
-                <button mat-stroked-button color="accent" (click)="validateAndProceed()">
-                    Next
-                </button>      
-            </div> 
+            <button mat-stroked-button color="accent" (click)="currentView = 'mapFields'">Next</button>
         </div>
     </div>
 
     <!-- View: Map Fields -->
     <div *ngIf="currentView === 'mapFields'" class="container py-3">
-        <h5 class="fw-bold mb-4 col-3 me-4">Map Fields</h5>
+        <h5 class="fw-bold mb-4 col-4">Map Fields</h5>
     
         <!-- Country Code Row -->
         <div class="row mb-3 align-items-center">
             <div class="col-md-4">
                 <label class="mb-0">Country Code</label>
             </div>
-        
             <div class="col-md-6">
-                <span *ngIf="countryCodeOption">
-                    <ng-container [ngSwitch]="countryCodeOption">
-                        <span *ngSwitchCase="'without'">Add {{ selectedCountryCodeColumn }} to number</span>
-                        <span *ngSwitchCase="'with'">Number contains country code</span>
-                        <span *ngSwitchCase="'column'">{{ selectedCountryCodeColumn }}</span>
+                <span>
+                   
+                    <ng-container *ngIf="countryCodeOption === 'without'">
+                        Add {{ selectedCountryCodeColumn }} to number
                     </ng-container>
-                </span>                  
+                    <ng-container *ngIf="countryCodeOption === 'with'">
+                        (+{{ selectedCountryCodeColumn }}) to number
+                    </ng-container>
+                    <ng-container *ngIf="countryCodeOption === 'column'">
+                        (From "{{ selectedCountryCodeColumn }}") to number
+                    </ng-container>
+                </span>
             </div>
-        
             <div class="col-md-2 text-end">
-                <a href="javascript:void(0)" (click)="openCountryCodeDialog()" class="text-primary fw-semibold">
-                    CHANGE
-                </a>                  
+                <a href="javascript:void(0)" (click)="openCountryCodeDialog()" class="text-primary fw-semibold">CHANGE</a>
             </div>
-        </div>          
+        </div>
     
         <!-- Phone Number Dropdown -->
         <div class="row mb-3 align-items-center">
@@ -151,9 +133,9 @@
             </div>
         
             <div class="col-md-8 position-relative">
-                <select class="form-select pe-5 custom-select-clear" [(ngModel)]="selectedPhoneField" (change)="onPhoneNumberSelect()">
+                <select class="form-select pe-5 custom-select-clear" [(ngModel)]="selectedPhoneField">
                     <option [ngValue]="null" disabled hidden>Select column</option>
-                    <option *ngFor="let column of excelColumns" [ngValue]="column">{{ column }}</option>
+                    <option *ngFor="let column of excelColumns" [value]="column">{{ column }}</option>
                 </select>
         
                 <!-- Show Clear (X) if selected -->
@@ -167,26 +149,20 @@
                     style="right: 0.75rem; pointer-events: none;">
                     ▼
                 </span>
-                <!-- Error message -->
-                <div *ngIf="showPhoneValidationError" class="text-danger small mt-1">
-                    Please select a phone number column
-                    </div>
             </div>
         </div>          
     
         <!-- Message -->
         <div class="row mb-3 align-items-center">
             <div class="col-md-4">
-                <label class="mb-0">Message   <span style="color: transparent;">&63a</span> </label>
+                <label class="mb-0">Message        <span style="color: transparent;">&63a</span> </label>
             </div>
             <div class="col-md-8">
                 <button class="btn btn-outline-primary w-100 mt-2" (click)="goToTemplateMessage()">
                     {{ getTemplateName() }}
                     <span *ngIf="selectedTemplateName" (click)="clearTemplateName($event)"
-                        style="cursor:pointer; color:red; font-size: 18px;"> X </span>
+                        style="cursor:pointer; color:red;"> X </span>
                 </button>
-                <div *ngIf="showTemplateValidationError" class="text-danger small mt-1">
-                    Please select a message template </div>
             </div>
         </div>
     
@@ -256,64 +232,70 @@
         </div>          
     
         <!-- Navigation Buttons -->
-        <div class="button d-flex justify-content-between mt-4">
+        <div class="d-flex justify-content-between mt-4">
             <button  mat-stroked-button color="accent" (click)="currentView = 'sheet'">Back</button>
-            <button mat-stroked-button color="accent" (click)="validateBeforePreview()">
-                Next   
-            </button>        
+            <button  mat-stroked-button color="accent" (click)="goToPreview()">Next</button>
         </div>
     </div>    
 
-
-    <div *ngIf="currentView === 'preview'" class="preview-container">
-    
-        <h5 class="fw-bold mb-3 col-8">WhatsApp Message Preview</h5>
+    <div *ngIf="currentView === 'preview'" class="container py-4 px-3"
+        style="max-width: 700px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+        <h5 class="fw-bold mb-3">WhatsApp Message Preview</h5>
     
         <!-- Template Name -->
-        <div class="mb-3 template-info row-4 col-8" >
-            <span class="fw-semibold " >Template Name:-</span>
-            <span class="text-muted ms-1 ">{{ getTemplateName() || 'No template used' }}</span>
+        <div class="mb-3">
+            <span class="fw-semibold">Template Name:-</span>
+            <span class="text-muted ms-1">{{ getTemplateName() || 'No template used' }}</span>
         </div>
     
-        <!-- WhatsApp Styled Card with Arrows -->
-        <div class="whatsapp-preview-wrapper">
+        <!-- WhatsApp Card -->
+        <div class="position-relative rounded"
+            style="background: #f0ecec url('https://i.ibb.co/Z2pxQ3v/whatsapp-bg.png') repeat; padding: 1rem;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-success px-3 py-2 rounded-pill">To: {{ getSelectedPhoneNumber() }}</span>
+                <span class="text-muted small">{{ currentIndex + 1 }}/{{ excelData.length }}</span>
+            </div>
     
-            <!-- Left Arrow -->
-            <button class="circle-arrow left" (click)="prev()" [disabled]="currentIndex === 0">
-                <span class="material-icons">arrow_back</span>
-            </button>
-    
-            <!-- Card -->
-            <div class="whatsapp-card" >
-                <div class="whatsapp-card-header">
-                    <span class="phone-badge">To: {{ getSelectedPhoneNumber() }}</span>    
-                </div>
-    
-                <div class="message-content">
-                    <div class="message-box">
-                        {{ convertHtml(getSelectedMessage()) }}
-                        <br /><br />
-                        <strong class="powered-text">Powered by cigtwa.com</strong>
-                    </div>
+            <!-- Attachments Preview -->
+            <div *ngIf="selectedFiles.length > 0" class="mb-3">
+                <div *ngFor="let file of selectedFiles" class="mb-2">
+                    <img *ngIf="file.type === 'Image'" [src]="file.url" class="img-thumbnail" style="max-width: 200px;" />
+                    <video *ngIf="file.type === 'Video'" [src]="file.url" controls class="img-thumbnail"
+                        style="max-width: 200px;"></video>
+                    <a *ngIf="file.type === 'Document'" [href]="file.url" target="_blank"
+                        class="btn btn-outline-secondary btn-sm">
+                        <span class="material-icons align-middle">insert_drive_file</span> View Document
+                    </a>
                 </div>
             </div>
     
-            <!-- Right Arrow -->
-            <button class="circle-arrow right" (click)="next()" [disabled]="currentIndex >= excelData.length - 1">
-                <span class="material-icons">arrow_forward</span>
+            <div class="bg-white rounded p-3 shadow-sm" style="max-width: 300px;">
+                <div class="text-dark">
+                    {{ convertHtml(getSelectedMessage()) }}
+                    <br /><br />
+                    <strong class="text-muted small">Powered by sheetwa.com</strong>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Navigation Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-primary" (click)="prev()" [disabled]="currentIndex === 0">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button class="btn btn-outline-primary" (click)="next()" [disabled]="currentIndex >= excelData.length - 1">
+                <mat-icon>arrow_forward</mat-icon>
             </button>
         </div>
     
-        <!-- Bottom Buttons -->
+        <!-- Bottom Action -->
         <div class="d-flex justify-content-between mt-4">
-            <button mat-stroked-button color="accent" (click)="currentView = 'mapFields'">Back</button>
-            <button mat-stroked-button color="accent" (click)="sendMessagesFromExcel()">Send Messages</button>
-        </div>
-    
-    </div>             
+            <button class="btn btn-outline-primary" (click)="currentView = 'mapFields'">Back</button>
+            <button class="btn btn-primary" (click)="sendMessagesFromExcel()">Send Messages</button>
+        </div></div>
 
 
-    <div *ngIf="currentView === 'processing'" class="text-center mt-5">
+    <div *ngIf="step === 'processing'" class="text-center mt-5">
         <div class="spinner-circle mx-auto mb-3">
             <span *ngIf="!isPaused" class="spinner-border text-primary" style="width: 64px; height: 64px;"></span>
             <span *ngIf="isPaused" class="material-icons text-primary" style="font-size: 64px;">pause</span>
@@ -335,7 +317,7 @@
     </div>
 
     <!-- Final Result View -->
-    <div *ngIf="currentView === 'result'" class="text-center mt-5">
+    <div *ngIf="step === 'result'" class="text-center mt-5">
         <span class="material-icons text-success" style="font-size: 64px;">check_circle</span>
         <h4>{{ result.deliverMsgCount + result.unDeliverMsgCount }} / {{ result.deliverMsgCount }} records processed
         </h4>

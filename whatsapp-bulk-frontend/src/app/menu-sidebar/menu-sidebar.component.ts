@@ -12,7 +12,6 @@ export class MenuSidebarComponent {
   @Input() activePanel: string = '';
 @Output() panelSelected = new EventEmitter<string>();
 
-  
 selectPanel(panel: string) {
   this.panelSelected.emit(panel);
 }

@@ -58,11 +58,8 @@ export class ManualEntryComponent implements OnInit {
   selectedTemplateName: string = '';
   selectedMessageField: string = '';
   templateName: string = '';
-  showTemplateValidationError: boolean = false;
-
   // error message
   errorMessage: string = '';
-
   //
   ngOnInit(): void {
     // this.messageService.message$.subscribe(msg => this.customMessage = msg ?? '');
@@ -230,7 +227,6 @@ export class ManualEntryComponent implements OnInit {
   //  Template Message 
 
   goToTemplateMessage() {
-    this.showTemplateValidationError = false;
       const dialogRef = this.dialog.open(TemplateMessageComponent, {
         width: '500px',
         disableClose: true,
@@ -262,21 +258,7 @@ export class ManualEntryComponent implements OnInit {
     event.stopPropagation();
     this.selectedTemplateName = '';
     this.customMessage = ''; // optionally clear the message too
-    this.showTemplateValidationError = true; 
-  }
-  validateBeforePreview() {
-    let isValid = true;  
-    // Validate template
-    const hasTemplate = this.getTemplateName().trim() !== 'Write Message Here';
-
-  if (!hasTemplate) {
-    this.showTemplateValidationError = true;
-    return;
   }
   
-    if (isValid) {
-      this.sendMessages(); // only proceed if all fields are valid
-    }
-  }
 }
 
